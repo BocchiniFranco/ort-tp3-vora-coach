@@ -53,7 +53,10 @@ enum class OrbState { IDLE, LISTENING, PROCESSING, SPEAKING, ERROR }
 fun VoraOrbGraphic(
     modifier: Modifier = Modifier,
     state: OrbState = OrbState.IDLE,
-    size: Dp = 200.dp
+    size: Dp = 200.dp,
+    // Color del halo exterior: menta sobre fondos claros; sobre una Hero Card oscura
+    // conviene pasar VoraSecondaryGreen para que no se vea un anillo gris.
+    haloColor: Color = VoraLightMint.copy(alpha = 0.55f)
 ) {
     // rememberInfiniteTransition: crea animaciones que se repiten mientras el orbe esté visible.
     val transition = rememberInfiniteTransition(label = "orb")
@@ -90,7 +93,7 @@ fun VoraOrbGraphic(
         Canvas(modifier = Modifier.fillMaxSize().scale(pulse)) {
             val radius = this.size.minDimension / 2f
             // Halo exterior traslúcido.
-            drawCircle(color = VoraLightMint.copy(alpha = 0.55f), radius = radius)
+            drawCircle(color = haloColor, radius = radius)
             // Cuerpo del orbe con degradado radial (centro claro -> borde oscuro).
             drawCircle(
                 brush = Brush.radialGradient(
