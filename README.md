@@ -47,16 +47,16 @@ La columna *Avance* se actualiza en cada entrega (⏳ placeholder navegable · �
 
 | Nº | Pantalla (Figma) | Ruta | Tipo | Resp. | Avance |
 |---|---|---|---|---|---|
-| 1.1 | Login | `access/login` | Demostración | I1 | ⏳ |
-| 1.2 | Register | `access/register` | Demostración | I1 | ⏳ |
-| 2.1 | Home Dashboard | `home/dashboard` | Demostración | I1 | ⏳ |
-| 2.2 | Notifications | `home/notifications` | Demostración | I1 | ⏳ |
-| 3.1 | Coach Ready | `coach/ready` | Demostración | I1 | ⏳ |
-| 3.2 | Coach Listening | `coach/listening` | Demostración | I1 | ⏳ |
-| 3.3 | Coach Processing | `coach/processing` | Demostración | I1 | ⏳ |
-| 3.4 | Coach Voice Response | `coach/voice-response` | Demostración | I1 | ⏳ |
-| 3.5 | Coach Conversation | `coach/conversation` | Demostración | I1 | ⏳ |
-| 3.6 | Coach Mic Error | `coach/mic-error` | Demostración | I1 | ⏳ |
+| 1.1 | Login | `access/login` | Demostración | I1 | ✅ |
+| 1.2 | Register | `access/register` | Demostración | I1 | ✅ |
+| 2.1 | Home Dashboard | `home/dashboard` | Demostración | I1 | ✅ |
+| 2.2 | Notifications | `home/notifications` | Demostración | I1 | ✅ |
+| 3.1 | Coach Ready | `coach/ready` | Demostración | I1 | ✅ |
+| 3.2 | Coach Listening | `coach/listening` | Demostración | I1 | ✅ |
+| 3.3 | Coach Processing | `coach/processing` | Demostración | I1 | ✅ |
+| 3.4 | Coach Voice Response | `coach/voice-response` | Demostración | I1 | ✅ |
+| 3.5 | Coach Conversation | `coach/conversation` | Demostración | I1 | ✅ |
+| 3.6 | Coach Mic Error | `coach/mic-error` | Demostración | I1 | ✅ |
 | 4.1 | Workout Dashboard | `workout/dashboard` | **Funcional** (GET `/v1/workouts` + Room) | I2 | ⏳ |
 | 4.2 | Weekly Plan | `workout/weekly-plan` | Demostración | I2 | ⏳ |
 | 4.3 | Workout Detail | `workout/detail/{workoutId}` | **Funcional** (GET `/v1/workouts/{workoutId}` + Room) | I2 | ⏳ |
@@ -97,7 +97,8 @@ El botón físico **Atrás** lo resuelve el `NavController` en todas las pantall
 app/src/main/java/ar/edu/ort/voracoach/
 ├── VoraApplication.kt          @HiltAndroidApp
 ├── MainActivity.kt             @AndroidEntryPoint (Single-Activity)
-├── navigation/                 Screen.kt (37 rutas) + VoraNavHost.kt
+├── navigation/                 Screen.kt (37 rutas), VoraNavHost.kt, NavigationExtensions.kt
+│   └── graphs/                 un NavGraph por flujo (Access, Home, Coach, Workout, Nutrition, Progress, Profile)
 ├── ui/
 │   ├── theme/                  Color.kt, Type.kt, Theme.kt
 │   ├── components/             componentes reutilizables VORA
@@ -203,6 +204,15 @@ git push origin entrega-tp3
 
 Reglas del equipo: commits chicos y descriptivos, nunca `push --force` sobre `main`, y cada integrante toca
 principalmente los archivos de su flujo para evitar conflictos.
+
+| Integrante | Grafo de navegación | Pantallas | ViewModels / datos |
+|---|---|---|---|
+| 1 | `graphs/AccessNavGraph.kt`, `HomeNavGraph.kt`, `CoachNavGraph.kt` | `ui/screens/login`, `register`, `home`, `coach` | `AuthViewModel`, `HomeViewModel`, `NotificationsViewModel`, `CoachConversationViewModel` |
+| 2 | `graphs/WorkoutNavGraph.kt`, `ProgressNavGraph.kt` | `ui/screens/workout`, `progress` | `WorkoutViewModel`, `data/remote`, `WorkoutRepository`, entidades/DAO de workouts |
+| 3 | `graphs/NutritionNavGraph.kt`, `ProfileNavGraph.kt` | `ui/screens/nutrition`, `profile` | `NutritionViewModel`, `NutritionRepository`, `VoraDatabase`, `MealEntity`/`MealDao` |
+
+Para reemplazar una pantalla provisoria basta cambiar `placeholderDestination(Screen.X, navController)` por un
+`composable(Screen.X.route) { ... }` con la pantalla real en el grafo correspondiente.
 
 ## 9. Uso de IA generativa (declaración)
 
