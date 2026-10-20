@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Colores XML usados SOLO por el tema de la ventana y el ícono (Compose usa Color.kt). -->
+<resources>
+    <color name="vora_background">#FFF5F8F7</color>
+    <color name="vora_surface">#FFFFFFFF</color>
+    <color name="vora_dark_green">#FF103B31</color>
+    <color name="vora_accent_lime">#FFC6E854</color>
+</resources>

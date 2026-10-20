@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Textos globales de la app. La UI usa los textos en inglés del diseño original de Figma. -->
+<resources>
+    <string name="app_name">VORA Coach</string>
+</resources>

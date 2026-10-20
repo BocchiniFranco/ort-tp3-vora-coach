@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Tema XML mínimo de la Activity (barra de estado y fondo antes de que Compose dibuje).
+    Los colores reales de la app se definen en Compose: ui/theme/Color.kt y Theme.kt.
+-->
+<resources>
+    <style name="Theme.VoraCoach" parent="android:Theme.Material.Light.NoActionBar">
+        <!-- Fondo #F5F8F7 para evitar un "flash" blanco al abrir la app. -->
+        <item name="android:windowBackground">@color/vora_background</item>
+        <item name="android:statusBarColor">@color/vora_background</item>
+        <item name="android:navigationBarColor">@color/vora_surface</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>

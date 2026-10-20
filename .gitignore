@@ -1,0 +1,22 @@
+# Archivos generados por Gradle y Android Studio que NO deben subirse al repositorio
+# (misma base que el proyecto de ejemplo de la cátedra: se versiona la configuración
+# compartida de .idea, pero no cachés ni el workspace personal de cada integrante).
+*.iml
+.gradle
+.kotlin
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Salida local de graphify (grafo de conocimiento del código): no se sube al repo
+graphify-out/

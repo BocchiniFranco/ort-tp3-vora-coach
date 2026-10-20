@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    AndroidManifest.xml: "documento de identidad" de la app.
+    Declara la clase Application, la Activity de entrada y los permisos.
+
+    NAV05 / RF: SOLO se pide INTERNET (para Retrofit). NO se declaran permisos de
+    CAMERA ni RECORD_AUDIO porque las pantallas de voz (3.x, 5.4) y foto (5.6) son
+    simulaciones de demostración y no deben solicitar permisos reales.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Permiso necesario para que Retrofit/OkHttp acceda al servidor mock. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!--
+        android:name=".VoraApplication": clase anotada con @HiltAndroidApp, punto de partida
+        del grafo de dependencias de Hilt. Sin esta línea Hilt no se inicializa y la app crashea.
+
+        android:usesCleartextTraffic="true": desde Android 9 el tráfico HTTP sin cifrar está
+        bloqueado por defecto. Lo habilitamos para poder usar el servidor mock LOCAL
+        http://10.0.2.2:8000/ (10.0.2.2 = "localhost" de la PC vista desde el emulador).
+        El servidor publicado https://tp3.martinrivas.ar/ sigue usando HTTPS.
+    -->
+    <application
+        android:name=".VoraApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:roundIcon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:usesCleartextTraffic="true"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.VoraCoach">
+
+        <!--
+            MainActivity: única Activity (arquitectura Single-Activity). Todas las pantallas
+            son @Composable dentro del NavHost. exported=true porque es el launcher.
+            windowSoftInputMode=adjustResize: el teclado no tapa los formularios (UI03).
+        -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.VoraCoach">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
