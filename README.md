@@ -117,23 +117,65 @@ Retrofit ni a un DAO directamente. Cada capa tiene su modelo (DTO → `toDomain(
 
 ## 5. Servidor mock y `baseUrl`
 
-| Opción | URL | Cómo activarla |
+### 5.1 Elegir el servidor (`gradle.properties`)
+
+La URL llega al código como `BuildConfig.BASE_URL`. Después de cambiar una propiedad:
+**File → Sync Project with Gradle Files** y volver a ejecutar la app.
+
+| Dónde corre la app | `vora.useLocalMock` | `vora.localMockUrl` |
 |---|---|---|
-| Servidor publicado | `https://tp3.martinrivas.ar/` | `vora.useLocalMock=false` en `gradle.properties` (por defecto) |
-| Servidor local | `http://10.0.2.2:8000/` | `vora.useLocalMock=true` en `gradle.properties` |
+| Servidor publicado de la cátedra (`https://tp3.martinrivas.ar/`) | `false` (por defecto) | no se usa |
+| Emulador con el mock en la PC | `true` | `http://10.0.2.2:8000/` (por defecto) |
+| Teléfono conectado por USB | `true` | `http://localhost:8000/` + ejecutar `adb reverse tcp:8000 tcp:8000` |
+| Teléfono por Wi-Fi | `true` | `http://<IP-de-la-PC>:8000/` + mock con `--host 0.0.0.0` |
 
-`10.0.2.2` es la IP con la que el **emulador** ve el `localhost` de la PC. Con un teléfono físico hay que usar la IP
-de la PC en la red local. Después de cambiar la propiedad: **File → Sync Project with Gradle Files** y volver a ejecutar.
-El valor llega al código como `BuildConfig.BASE_URL`.
+`10.0.2.2` es la IP con la que el **emulador** ve el `localhost` de la PC. `adb reverse` hace lo mismo para un
+teléfono conectado por USB: el `localhost:8000` del teléfono pasa a ser el de la PC. El manifest ya permite HTTP sin
+cifrar (`usesCleartextTraffic`) para estas URLs locales.
 
-Endpoints usados: `GET /v1/workouts` y `GET /v1/workouts/{workoutId}`.
+> El servidor publicado resuelve a una IP privada (`100.112.x.x`) y no responde desde redes externas: para
+> desarrollar y para la defensa usamos el mock local.
 
-Escenarios de prueba (RF05) que inyecta el `MockHeaderInterceptor` de OkHttp:
+### 5.2 Levantar el mock local de la cátedra
 
-| Header | Valores |
-|---|---|
-| `X-Mock-Scenario` | `normal`, `empty`, `error`, `malformed` |
-| `X-Mock-Delay-Ms` | demora en milisegundos (ej. `3000`) |
+El mock (`server.py`) es material del curso y **no se sube a este repositorio** (`/mock/` y `/tools/mock-server/`
+están en `.gitignore`). Cada integrante lo descarga del material de la materia. Solo necesita Python 3.9+, sin
+dependencias:
+
+```bash
+cd ruta/al/mock
+python server.py                  # escucha en http://127.0.0.1:8000 (emulador o adb reverse)
+python server.py --host 0.0.0.0   # además acepta conexiones desde la red Wi-Fi
+python test_server.py             # pruebas del propio mock (deben dar OK)
+```
+
+Con el mock corriendo, `http://localhost:8000/docs` muestra el contrato en Swagger UI.
+
+### 5.3 Contrato usado por la app (Flujo 4)
+
+| Endpoint | Respuesta OK | Campos |
+|---|---|---|
+| `GET /v1/workouts` (filtro opcional `?level=`) | `{"data": [ ... ]}` | `id`, `name`, `level` (`beginner` · `intermediate` · `advanced`), `durationMinutes`, `exerciseCount` |
+| `GET /v1/workouts/{workoutId}` | `{"data": { ... }}` | los anteriores + `description` y `exercises[]` con `id`, `name`, `muscleGroup`, `sets`, `reps`, `restSeconds`, `instructions`, `tip` |
+
+Errores: siempre `{"error": {"code": "...", "message": "..."}}`. Por ejemplo `503 SERVICE_UNAVAILABLE` o
+`404 WORKOUT_NOT_FOUND` cuando el id no existe. Se mapean con `ErrorResponseDto`.
+
+Los demás endpoints del contrato (`/v1/plans/weekly`, `/v1/foods`, `/v1/coach/*`, `/v1/nutrition/analyses`,
+`/v1/progress/weekly-review`, `/v1/activity/daily`) son **opcionales** y no se usan: la consigna pide Retrofit solo
+en Entrenamiento, y el resto de los módulos funcionan con datos de demostración o con Room.
+
+### 5.4 Escenarios de prueba (RF05)
+
+El `MockHeaderInterceptor` de OkHttp agrega estos headers a cada request:
+
+| Header | Valor | Qué devuelve el mock | Qué debe mostrar la app |
+|---|---|---|---|
+| `X-Mock-Scenario` | `normal` | datos | lista / detalle |
+| | `empty` | `{"data": []}` en listas (el detalle responde normal) | estado vacío |
+| | `error` | HTTP 503 `SERVICE_UNAVAILABLE` | error con reintento, sin borrar la caché de Room |
+| | `malformed` | **HTTP 200** con JSON inválido | error con reintento: el fallo aparece al parsear (Gson), no en `isSuccessful` |
+| `X-Mock-Delay-Ms` | `0` a `10000` | responde con esa demora | estado Loading |
 
 ## 6. Hilt y su relación con Dagger (RF08)
 
