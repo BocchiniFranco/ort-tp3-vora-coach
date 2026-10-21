@@ -11,11 +11,11 @@ Kotlin · Jetpack Compose · Material 3 · Clean Architecture + MVVM · Hilt/Dag
 
 ## 1. Integrantes
 
-| # | Integrante      | Responsabilidad |
-|---|-----------------|---|
-| 1 | Franco Bocchini | Base del proyecto (Gradle, Hilt, tema, componentes reutilizables), navegación (37 rutas) y flujos 1, 2 y 3 |
-| 2 | Mateo Gago      | Entrenamiento funcional con Retrofit + caché Room (flujo 4) y Progreso (flujo 6) |
-| 3 | Hugo Guarneri   | Nutrición funcional con Room (flujo 5), Perfil (flujo 7) y documentación |
+| # | Integrante | Responsabilidad |
+|---|---|---|
+| 1 | Franco Bocchini ([@BocchiniFranco](https://github.com/BocchiniFranco)) | Base del proyecto (Gradle, Hilt, tema, componentes reutilizables), navegación (37 rutas) y flujos 1, 2 y 3 |
+| 2 | Mateo Gago ([@MateoGago](https://github.com/MateoGago)) | Entrenamiento funcional con Retrofit + caché Room (flujo 4) y Progreso (flujo 6) |
+| 3 | Hugo Guarneri ([@hugoguarneri](https://github.com/hugoguarneri)) | Nutrición funcional con Room (flujo 5), Perfil (flujo 7) y documentación |
 
 ## 2. Diseño de referencia (Figma)
 
@@ -113,6 +113,7 @@ app/src/main/java/ar/edu/ort/voracoach/
 ├── model/                      modelos de dominio que consume la UI
 ├── data/
 │   ├── remote/                 WorkoutApiService (Retrofit) + dto/ (ApiResponseDto<T>, ErrorResponseDto)
+│   │                           + MockScenarioConfig y MockHeaderInterceptor (headers X-Mock-*)
 │   ├── local/                  VoraDatabase, entity/ (@Entity), dao/ (@Dao)
 │   └── repository/             WorkoutRepository, NutritionRepository
 └── di/                         NetworkModule, DatabaseModule (@Module @InstallIn(SingletonComponent))
@@ -289,10 +290,10 @@ codeburn
 npx codeburn
 ```
 
-| Integrante   | Herramienta      | Tokens / costo reportado por Codeburn                                                                                                                                                                                                        |
-|--------------|------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Integrante 1 | Claude Code      | _(completar con la salida de Codeburn)_                                                                                                                                                                                                      |
-| Mateo Gago   | Claude app(nube) | Codeburn local: $0.00 / 0 sesiones en los últimos 30 días (período del TP). La asistencia se hizo desde la app de Claude en la nube, que no deja registros locales que Codeburn pueda leer [Captura](docs/capturas/codeburn_integrante2.png) |
+| Integrante | Herramienta | Tokens / costo reportado por Codeburn |
+|---|---|---|
+| Franco Bocchini | Claude Code (modelo Opus 5.5) | 340 llamadas · 106.938.503 tokens (98 % lectura de caché) · costo estimado US$ 42,96 — medido el 21/10/2026 con `npx codeburn overview --period all` |
+| Mateo Gago | Claude app(nube) | Codeburn local: $0.00 / 0 sesiones en los últimos 30 días (período del TP). La asistencia se hizo desde la app de Claude en la nube, que no deja registros locales que Codeburn pueda leer [Captura](docs/capturas/codeburn_integrante2.png) |
 | Hugo Guarneri | Claude Code (Opus 5.5) | Codeburn, 1 sesión dedicada al parcial (21 al 27/10): USD 65,38 de la sesión + USD 4,67 de 1 subagente (≈ USD 70 a precio de API), 403 llamadas y ~205 M tokens, el 98 % lectura de caché. [Captura](docs/capturas/codeburn_integrante3.png) |
 
 ## 10. Comparaciones visuales Figma vs. app (UI01)
