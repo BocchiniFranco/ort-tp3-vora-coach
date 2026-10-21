@@ -28,6 +28,13 @@ data class CoachNote(
     val body: String     // texto principal
 )
 
+/** Un día de la fila "This Week's Activity" de 4.1. */
+data class WeekActivityDay(
+    val label: String,             // inicial del día: "M", "T", ...
+    val isDone: Boolean,           // true = ya entrenó ese día (círculo verde)
+    val isToday: Boolean = false   // true = hoy (círculo oscuro)
+)
+
 /** "object" = una sola instancia con los datos fijos de demostración. */
 object WorkoutDemoData {
 
@@ -107,4 +114,33 @@ object WorkoutDemoData {
 
     /** Sugerencia del botón "Need anything?". */
     const val PRE_WORKOUT_SUGGESTION = "\"Recommend a chest warm-up\""
+
+    // ----------------------------- 4.1 Workout Dashboard -----------------------------
+
+    /** Intensidad del entrenamiento de hoy (píldora de la tarjeta oscura). */
+    const val TODAY_WORKOUT_INTENSITY = "MODERATE"
+
+    /** Detalle del entrenamiento de hoy en la tarjeta oscura. */
+    const val TODAY_WORKOUT_FOCUS = "42 min • 5 exercises • Focus: Chest & Back"
+
+    /** Recomendación de VORA en el banner menta. */
+    const val DASHBOARD_RECOMMENDATION =
+        "Your last upper-body session was 4 days ago. Today is a great opportunity " +
+                "to hit your strength volume targets."
+
+    /** Fila "This Week's Activity". */
+    val weekActivity = listOf(
+        WeekActivityDay("M", isDone = true),
+        WeekActivityDay("T", isDone = true),
+        WeekActivityDay("W", isDone = false),
+        WeekActivityDay("T", isDone = true),
+        WeekActivityDay("F", isDone = false, isToday = true),
+        WeekActivityDay("S", isDone = false),
+        WeekActivityDay("S", isDone = false)
+    )
+
+    /** Tarjeta "Your Progress". */
+    const val PROGRESS_STREAK = "4 Days"
+    const val PROGRESS_WORKOUTS = "3/5"
+    const val PROGRESS_VOLUME = "8,420 kg"
 }
