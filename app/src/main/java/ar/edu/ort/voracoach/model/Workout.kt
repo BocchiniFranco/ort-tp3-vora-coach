@@ -10,7 +10,7 @@ data class Exercise(
     val name: String, //nombre del ejercicio
     val sets: Int,     //cantidad series
     val reps: Int,      //repeticiones por serie
-    val instructions : String //como se hace
+    val instructions: String //como se hace
 )
 
 /** Un entrenamiento del catálogo (cada fila de la lista en 4.1 Workout Dashboard). */
@@ -20,6 +20,7 @@ data class Workout(
     val level: String, // ej Beginner
     val durationMinutes: Int //duracion en minutos
 )
+
 /** El detalle completo de un entrenamiento, con sus ejercicios (4.3). */
 data class WorkoutDetail(
     val id: String,
