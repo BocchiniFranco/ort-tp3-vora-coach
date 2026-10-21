@@ -1,5 +1,6 @@
 package ar.edu.ort.voracoach.di
 
+import ar.edu.ort.voracoach.data.remote.WorkoutApiService
 import ar.edu.ort.voracoach.BuildConfig
 import ar.edu.ort.voracoach.data.remote.MockHeaderInterceptor
 import dagger.Module
@@ -59,4 +60,13 @@ object NetworkModule {
             .client(okHttpClient)                              // usa nuestro cartero
             .addConverterFactory(GsonConverterFactory.create()) // JSON <-> objetos Kotlin
             .build()
+
+    /**
+     * Receta del "menú" de pedidos (WorkoutApiService).
+     * retrofit.create(...) genera la implementación de la interface automáticamente.
+     */
+    @Provides
+    @Singleton
+    fun provideWorkoutApiService(retrofit: Retrofit): WorkoutApiService =
+        retrofit.create(WorkoutApiService::class.java)
 }
