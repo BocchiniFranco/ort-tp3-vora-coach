@@ -2,6 +2,8 @@
 // app/build.gradle.kts - Configuración del módulo de la aplicación VORA Coach
 // (Estructura alineada con el proyecto de ejemplo de la cátedra.)
 // =====================================================================================
+import java.util.Properties
+
 plugins {
     // Convierte este módulo en una app Android instalable (.apk). En AGP 9 Kotlin viene incluido.
     alias(libs.plugins.android.application)
@@ -13,18 +15,23 @@ plugins {
     alias(libs.plugins.hilt.android)
 }
 
-// Lee la propiedad vora.useLocalMock de gradle.properties para elegir el servidor mock.
-val useLocalMock: Boolean =
-    (project.findProperty("vora.useLocalMock") as String?)?.toBoolean() ?: false
+// api.properties (raíz del repo) dice qué servidor usa la app y define las dos URL base.
+val apiProperties = Properties().apply {
+    rootProject.file("api.properties").inputStream().use { load(it) }
+}
 
-// URL del mock local (emulador, teléfono con adb reverse o IP de la PC). Si falta la
-// propiedad se usa la del emulador. Se fuerza la barra final porque Retrofit la exige.
-val localMockUrl: String =
-    ((project.findProperty("vora.localMockUrl") as String?)?.trim()?.takeIf { it.isNotEmpty() }
-        ?: "http://10.0.2.2:8000/").let { if (it.endsWith("/")) it else "$it/" }
+// vora.server=mock -> mock local (vora.mockBaseUrl); vora.server=api -> cátedra (vora.apiBaseUrl).
+val apiServer: String = apiProperties.getProperty("vora.server", "mock").trim()
+val baseUrlKey: String = when (apiServer) {
+    "mock" -> "vora.mockBaseUrl"
+    "api" -> "vora.apiBaseUrl"
+    else -> error("api.properties: vora.server debe ser mock o api (vale '$apiServer')")
+}
 
-// URL publicada del servidor de la cátedra.
-val publishedApiUrl = "https://tp3.martinrivas.ar/"
+// Se fuerza la barra final porque Retrofit la exige.
+val baseUrl: String =
+    (apiProperties.getProperty(baseUrlKey)?.trim() ?: error("api.properties: falta $baseUrlKey"))
+        .let { if (it.endsWith("/")) it else "$it/" }
 
 android {
     // Paquete base de las clases generadas (R, BuildConfig).
@@ -47,12 +54,8 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // buildConfigField crea la constante BuildConfig.BASE_URL accesible desde Kotlin.
-        // Así el NetworkModule no tiene la URL "hardcodeada" y se cambia desde gradle.properties.
-        buildConfigField(
-            "String",
-            "BASE_URL",
-            "\"${if (useLocalMock) localMockUrl else publishedApiUrl}\""
-        )
+        // Así el NetworkModule no tiene la URL "hardcodeada" y se cambia desde api.properties.
+        buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
     }
 
     buildTypes {
