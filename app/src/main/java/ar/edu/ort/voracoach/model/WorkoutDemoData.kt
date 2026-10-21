@@ -21,6 +21,13 @@ data class PlannedSession(
     val isRecovery: Boolean = false    // true = día de recuperación (punto verde)
 )
 
+/** Una tarjeta de información antes de entrenar (4.4 Pre Workout). */
+data class CoachNote(
+    val label: String,   // etiqueta chica arriba, ej. "TODAY'S FOCUS"
+    val title: String?,  // título opcional (null = la tarjeta no tiene título)
+    val body: String     // texto principal
+)
+
 /** "object" = una sola instancia con los datos fijos de demostración. */
 object WorkoutDemoData {
 
@@ -69,4 +76,35 @@ object WorkoutDemoData {
 
     /** Sugerencias rápidas para hablar con VORA. */
     val adjustSuggestions = listOf("I'm tired today", "Move Wed workout to Fri")
+
+
+// ------------------------------- 4.4 Pre Workout -------------------------------
+
+    /** Entrenamiento que se está por empezar (el de hoy). */
+    const val TODAY_WORKOUT_TITLE = "Upper Body Strength"
+    const val TODAY_WORKOUT_SUMMARY = "42 min • 5 exercises"
+
+    /** Tarjetas de 4.4: foco del día, última sesión y consejo del coach. */
+    val preWorkoutNotes = listOf(
+        CoachNote(
+            label = "TODAY'S FOCUS",
+            title = "Controlled Repetitions",
+            body = "Keep concentric lifts explosive and focus on a slow, 2-second " +
+                    "eccentric return for maximal hypertrophy stimulus."
+        ),
+        CoachNote(
+            label = "YOUR LAST SESSION",
+            title = "Bench Press Volume",
+            body = "Set 1: 40 kg × 10 • Set 2: 40 kg × 9 • Set 3: 37.5 kg × 10"
+        ),
+        CoachNote(
+            label = "VORA'S COACH TIP",
+            title = null,
+            body = "\"Start slightly lighter on your first set. If your form feels " +
+                    "exceptionally robust, increase the load.\""
+        )
+    )
+
+    /** Sugerencia del botón "Need anything?". */
+    const val PRE_WORKOUT_SUGGESTION = "\"Recommend a chest warm-up\""
 }

@@ -1,5 +1,6 @@
 package ar.edu.ort.voracoach.navigation.graphs
 
+import ar.edu.ort.voracoach.ui.screens.workout.PreWorkoutScreen
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -50,7 +51,20 @@ fun NavGraphBuilder.workoutGraph(navController: NavHostController) {
         Screen.WorkoutDetail, navController,
         arguments = listOf(navArgument(Screen.ARG_WORKOUT_ID) { type = NavType.StringType })
     )
-    placeholderDestination(Screen.WorkoutPrep, navController)
+    // 4.4 Pre Workout (demo): "GET READY" antes de empezar a entrenar.
+    composable(Screen.WorkoutPrep.route) {
+        PreWorkoutScreen(
+            title = WorkoutDemoData.TODAY_WORKOUT_TITLE,
+            summary = WorkoutDemoData.TODAY_WORKOUT_SUMMARY,
+            notes = WorkoutDemoData.preWorkoutNotes,
+            suggestion = WorkoutDemoData.PRE_WORKOUT_SUGGESTION,
+            onCloseClick = { navController.popBackStack() },
+            // El micrófono abre el asistente de voz (simulado, sin permisos)
+            onAskVoraClick = { navController.navigate(Screen.CoachReady.route) },
+            // Empieza el entrenamiento activo (4.5)
+            onStartWorkoutClick = { navController.navigate(Screen.ActiveWorkout.route) }
+        )
+    }
     placeholderDestination(Screen.ActiveWorkout, navController)
     placeholderDestination(Screen.ExerciseGuide, navController)
     placeholderDestination(Screen.WorkoutCompleted, navController)
