@@ -117,17 +117,18 @@ Retrofit ni a un DAO directamente. Cada capa tiene su modelo (DTO → `toDomain(
 
 ## 5. Servidor mock y `baseUrl`
 
-### 5.1 Elegir el servidor (`gradle.properties`)
+### 5.1 Elegir el servidor (`api.properties`)
 
-La URL llega al código como `BuildConfig.BASE_URL`. Después de cambiar una propiedad:
-**File → Sync Project with Gradle Files** y volver a ejecutar la app.
+`api.properties`, en la raíz del repo, define las dos URL base y cuál se usa. La URL elegida llega al código como
+`BuildConfig.BASE_URL`. Después de cambiar una propiedad: **File → Sync Project with Gradle Files** y volver a
+ejecutar la app.
 
-| Dónde corre la app | `vora.useLocalMock` | `vora.localMockUrl` |
+| Dónde corre la app | `vora.server` | URL base |
 |---|---|---|
-| Servidor publicado de la cátedra (`https://tp3.martinrivas.ar/`) | `false` (por defecto) | no se usa |
-| Emulador con el mock en la PC | `true` | `http://10.0.2.2:8000/` (por defecto) |
-| Teléfono conectado por USB | `true` | `http://localhost:8000/` + ejecutar `adb reverse tcp:8000 tcp:8000` |
-| Teléfono por Wi-Fi | `true` | `http://<IP-de-la-PC>:8000/` + mock con `--host 0.0.0.0` |
+| Servidor publicado de la cátedra | `api` | `vora.apiBaseUrl=https://tp3.martinrivas.ar/` |
+| Emulador con el mock en la PC | `mock` (por defecto) | `vora.mockBaseUrl=http://10.0.2.2:8000/` |
+| Teléfono conectado por USB | `mock` | `vora.mockBaseUrl=http://localhost:8000/` + ejecutar `adb reverse tcp:8000 tcp:8000` |
+| Teléfono por Wi-Fi | `mock` | `vora.mockBaseUrl=http://<IP-de-la-PC>:8000/` + mock con `--host 0.0.0.0` |
 
 `10.0.2.2` es la IP con la que el **emulador** ve el `localhost` de la PC. `adb reverse` hace lo mismo para un
 teléfono conectado por USB: el `localhost:8000` del teléfono pasa a ser el de la PC. El manifest ya permite HTTP sin
