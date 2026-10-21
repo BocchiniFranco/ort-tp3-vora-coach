@@ -20,3 +20,7 @@ local.properties
 
 # Salida local de graphify (grafo de conocimiento del código): no se sube al repo
 graphify-out/
+
+# Mock local de la cátedra: se obtiene del material del curso y NO se sube al repo
+/mock/
+/tools/mock-server/

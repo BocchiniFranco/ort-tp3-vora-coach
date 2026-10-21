@@ -17,6 +17,15 @@ plugins {
 val useLocalMock: Boolean =
     (project.findProperty("vora.useLocalMock") as String?)?.toBoolean() ?: false
 
+// URL del mock local (emulador, teléfono con adb reverse o IP de la PC). Si falta la
+// propiedad se usa la del emulador. Se fuerza la barra final porque Retrofit la exige.
+val localMockUrl: String =
+    ((project.findProperty("vora.localMockUrl") as String?)?.trim()?.takeIf { it.isNotEmpty() }
+        ?: "http://10.0.2.2:8000/").let { if (it.endsWith("/")) it else "$it/" }
+
+// URL publicada del servidor de la cátedra.
+val publishedApiUrl = "https://tp3.martinrivas.ar/"
+
 android {
     // Paquete base de las clases generadas (R, BuildConfig).
     namespace = "ar.edu.ort.voracoach"
@@ -42,7 +51,7 @@ android {
         buildConfigField(
             "String",
             "BASE_URL",
-            if (useLocalMock) "\"http://10.0.2.2:8000/\"" else "\"https://tp3.martinrivas.ar/\""
+            "\"${if (useLocalMock) localMockUrl else publishedApiUrl}\""
         )
     }
 
