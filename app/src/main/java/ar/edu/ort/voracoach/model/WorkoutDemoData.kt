@@ -21,6 +21,20 @@ data class PlannedSession(
     val isRecovery: Boolean = false    // true = día de recuperación (punto verde)
 )
 
+/** Una tarjeta de información antes de entrenar (4.4 Pre Workout). */
+data class CoachNote(
+    val label: String,   // etiqueta chica arriba, ej. "TODAY'S FOCUS"
+    val title: String?,  // título opcional (null = la tarjeta no tiene título)
+    val body: String     // texto principal
+)
+
+/** Un día de la fila "This Week's Activity" de 4.1. */
+data class WeekActivityDay(
+    val label: String,             // inicial del día: "M", "T", ...
+    val isDone: Boolean,           // true = ya entrenó ese día (círculo verde)
+    val isToday: Boolean = false   // true = hoy (círculo oscuro)
+)
+
 /** "object" = una sola instancia con los datos fijos de demostración. */
 object WorkoutDemoData {
 
@@ -69,4 +83,64 @@ object WorkoutDemoData {
 
     /** Sugerencias rápidas para hablar con VORA. */
     val adjustSuggestions = listOf("I'm tired today", "Move Wed workout to Fri")
+
+
+// ------------------------------- 4.4 Pre Workout -------------------------------
+
+    /** Entrenamiento que se está por empezar (el de hoy). */
+    const val TODAY_WORKOUT_TITLE = "Upper Body Strength"
+    const val TODAY_WORKOUT_SUMMARY = "42 min • 5 exercises"
+
+    /** Tarjetas de 4.4: foco del día, última sesión y consejo del coach. */
+    val preWorkoutNotes = listOf(
+        CoachNote(
+            label = "TODAY'S FOCUS",
+            title = "Controlled Repetitions",
+            body = "Keep concentric lifts explosive and focus on a slow, 2-second " +
+                    "eccentric return for maximal hypertrophy stimulus."
+        ),
+        CoachNote(
+            label = "YOUR LAST SESSION",
+            title = "Bench Press Volume",
+            body = "Set 1: 40 kg × 10 • Set 2: 40 kg × 9 • Set 3: 37.5 kg × 10"
+        ),
+        CoachNote(
+            label = "VORA'S COACH TIP",
+            title = null,
+            body = "\"Start slightly lighter on your first set. If your form feels " +
+                    "exceptionally robust, increase the load.\""
+        )
+    )
+
+    /** Sugerencia del botón "Need anything?". */
+    const val PRE_WORKOUT_SUGGESTION = "\"Recommend a chest warm-up\""
+
+    // ----------------------------- 4.1 Workout Dashboard -----------------------------
+
+    /** Intensidad del entrenamiento de hoy (píldora de la tarjeta oscura). */
+    const val TODAY_WORKOUT_INTENSITY = "MODERATE"
+
+    /** Detalle del entrenamiento de hoy en la tarjeta oscura. */
+    const val TODAY_WORKOUT_FOCUS = "42 min • 5 exercises • Focus: Chest & Back"
+
+    /** Recomendación de VORA en el banner menta. */
+    const val DASHBOARD_RECOMMENDATION =
+        "Your last upper-body session was 4 days ago. Today is a great opportunity " +
+                "to hit your strength volume targets."
+
+    /** Fila "This Week's Activity". */
+    val weekActivity = listOf(
+        WeekActivityDay("M", isDone = true),
+        WeekActivityDay("T", isDone = true),
+        WeekActivityDay("W", isDone = false),
+        WeekActivityDay("T", isDone = true),
+        WeekActivityDay("F", isDone = false, isToday = true),
+        WeekActivityDay("S", isDone = false),
+        WeekActivityDay("S", isDone = false)
+    )
+
+    /** Tarjeta "Your Progress". */
+    const val PROGRESS_STREAK = "4 Days"
+    const val PROGRESS_WORKOUTS = "3/5"
+    const val PROGRESS_VOLUME = "8,420 kg"
 }

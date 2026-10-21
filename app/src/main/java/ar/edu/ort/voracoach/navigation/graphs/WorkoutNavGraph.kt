@@ -1,5 +1,10 @@
 package ar.edu.ort.voracoach.navigation.graphs
 
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ar.edu.ort.voracoach.ui.screens.workout.WorkoutDashboardScreen
+import ar.edu.ort.voracoach.viewmodel.WorkoutViewModel
+import ar.edu.ort.voracoach.ui.screens.workout.PreWorkoutScreen
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -22,7 +27,33 @@ import ar.edu.ort.voracoach.ui.screens.workout.WeeklyPlanScreen
  * Las que siguen con placeholderDestination(...) están pendientes.
  */
 fun NavGraphBuilder.workoutGraph(navController: NavHostController) {
-    placeholderDestination(Screen.WorkoutDashboard, navController)
+    // 4.1 Workout Dashboard (FUNCIONAL): catálogo real con Retrofit (RF01, RF05).
+    composable(Screen.WorkoutDashboard.route) {
+        // hiltViewModel(): Hilt crea el ViewModel (con su repositorio) y lo mantiene
+        // vivo mientras esta pantalla esté en la pila: al rotar NO se vuelve a crear (RF07).
+        val viewModel: WorkoutViewModel = hiltViewModel()
+        // collectAsStateWithLifecycle(): observa el StateFlow y redibuja cuando cambia
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        val scenario by viewModel.scenario.collectAsStateWithLifecycle()
+        val slowMode by viewModel.slowMode.collectAsStateWithLifecycle()
+
+        WorkoutDashboardScreen(
+            uiState = uiState,
+            selectedScenario = scenario,
+            slowMode = slowMode,
+            onWeeklyPlanClick = { navController.navigate(Screen.WeeklyPlan.route) },
+            onStartWorkoutClick = { navController.navigate(Screen.WorkoutPrep.route) },
+            onTodayDetailsClick = { navController.navigate(Screen.WeeklyPlan.route) },
+            // NAV04: cada entrenamiento abre SU detalle, con su propio id
+            onWorkoutClick = { workoutId ->
+                navController.navigate(Screen.WorkoutDetail.createRoute(workoutId))
+            },
+            onViewProgressClick = { navController.navigate(Screen.WorkoutProgress.route) },
+            onRetryClick = viewModel::retry,
+            onScenarioSelected = viewModel::onScenarioSelected,
+            onSlowModeChanged = viewModel::onSlowModeChanged
+        )
+    }
 
     // 4.2 Weekly Plan (demo): plan de la semana con datos de WorkoutDemoData.
     composable(Screen.WeeklyPlan.route) {
@@ -50,7 +81,20 @@ fun NavGraphBuilder.workoutGraph(navController: NavHostController) {
         Screen.WorkoutDetail, navController,
         arguments = listOf(navArgument(Screen.ARG_WORKOUT_ID) { type = NavType.StringType })
     )
-    placeholderDestination(Screen.WorkoutPrep, navController)
+    // 4.4 Pre Workout (demo): "GET READY" antes de empezar a entrenar.
+    composable(Screen.WorkoutPrep.route) {
+        PreWorkoutScreen(
+            title = WorkoutDemoData.TODAY_WORKOUT_TITLE,
+            summary = WorkoutDemoData.TODAY_WORKOUT_SUMMARY,
+            notes = WorkoutDemoData.preWorkoutNotes,
+            suggestion = WorkoutDemoData.PRE_WORKOUT_SUGGESTION,
+            onCloseClick = { navController.popBackStack() },
+            // El micrófono abre el asistente de voz (simulado, sin permisos)
+            onAskVoraClick = { navController.navigate(Screen.CoachReady.route) },
+            // Empieza el entrenamiento activo (4.5)
+            onStartWorkoutClick = { navController.navigate(Screen.ActiveWorkout.route) }
+        )
+    }
     placeholderDestination(Screen.ActiveWorkout, navController)
     placeholderDestination(Screen.ExerciseGuide, navController)
     placeholderDestination(Screen.WorkoutCompleted, navController)
