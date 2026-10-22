@@ -1,5 +1,7 @@
 package ar.edu.ort.voracoach.navigation.graphs
 
+import ar.edu.ort.voracoach.ui.screens.workout.WorkoutDetailScreen
+import ar.edu.ort.voracoach.viewmodel.WorkoutDetailViewModel
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ar.edu.ort.voracoach.ui.screens.workout.WorkoutDashboardScreen
@@ -76,11 +78,26 @@ fun NavGraphBuilder.workoutGraph(navController: NavHostController) {
         )
     }
 
-    // 4.3: {workoutId} obligatorio (String) -> GET /v1/workouts/{workoutId}
-    placeholderDestination(
-        Screen.WorkoutDetail, navController,
+    // 4.3 Workout Detail (FUNCIONAL): GET /v1/workouts/{workoutId} (RF01, NAV04).
+    composable(
+        route = Screen.WorkoutDetail.route,
+        // El argumento {workoutId} es obligatorio y es texto. Llega al ViewModel por SavedStateHandle.
         arguments = listOf(navArgument(Screen.ARG_WORKOUT_ID) { type = NavType.StringType })
-    )
+    ) {
+        val viewModel: WorkoutDetailViewModel = hiltViewModel()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+        WorkoutDetailScreen(
+            uiState = uiState,
+            onBackClick = { navController.popBackStack() },
+            onRetryClick = viewModel::retry,
+            onStartWorkoutClick = { navController.navigate(Screen.WorkoutPrep.route) },
+            // "Edit workout": se ajusta hablando con VORA (simulado)
+            onEditWorkoutClick = { navController.navigate(Screen.CoachConversation.route) },
+            // Cada ejercicio abre la guía de ejecución (4.6)
+            onExerciseClick = { navController.navigate(Screen.ExerciseGuide.route) }
+        )
+    }
     // 4.4 Pre Workout (demo): "GET READY" antes de empezar a entrenar.
     composable(Screen.WorkoutPrep.route) {
         PreWorkoutScreen(
