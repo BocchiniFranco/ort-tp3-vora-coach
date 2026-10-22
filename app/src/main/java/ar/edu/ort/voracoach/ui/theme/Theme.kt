@@ -38,20 +38,22 @@ private val VoraColorScheme = lightColorScheme(
     surfaceContainer = VoraSurface,
     surfaceContainerHigh = VoraSurface,
     surfaceContainerHighest = VoraBackground,
-    outline = VoraLightMintBorder,
-    outlineVariant = VoraDivider,
+    outline = VoraBorder,
+    outlineVariant = VoraBorder,
     error = VoraStatusError,
     onError = VoraSurface
 )
 
 /**
- * Formas globales: las tarjetas del diseño usan radios de 20 a 24 dp.
+ * Formas globales (lámina "Espaciado y radios" del Figma): 12 dp en campos y mensajes,
+ * 16 dp en tarjetas, 20–24 dp en paneles destacados. Botones y chips usan píldora (100).
  */
 private val VoraShapes = Shapes(
+    extraSmall = RoundedCornerShape(8.dp),
     small = RoundedCornerShape(12.dp),
-    medium = RoundedCornerShape(20.dp),
-    large = RoundedCornerShape(24.dp),
-    extraLarge = RoundedCornerShape(28.dp)
+    medium = RoundedCornerShape(16.dp),
+    large = RoundedCornerShape(20.dp),
+    extraLarge = RoundedCornerShape(24.dp)
 )
 
 /**
