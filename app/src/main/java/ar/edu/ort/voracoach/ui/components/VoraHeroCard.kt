@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -21,25 +23,29 @@ import androidx.compose.ui.Modifier
 // clip: recorta el contenido a una forma (esquinas redondeadas).
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import ar.edu.ort.voracoach.ui.theme.VoraAccentLime
-import ar.edu.ort.voracoach.ui.theme.VoraDarkGreen
-import ar.edu.ort.voracoach.ui.theme.VoraSecondaryGreen
+import androidx.compose.ui.unit.sp
+import ar.edu.ort.voracoach.ui.theme.VoraGreen
+import ar.edu.ort.voracoach.ui.theme.VoraLime
+import ar.edu.ort.voracoach.ui.theme.VoraMint
 
 /**
- * VoraHeroCard: tarjeta destacada verde oscuro (#103B31) con esquinas de 24 dp.
- * Se usa en Home ("VORA Coach / AI ONLINE"), Workout ("READY FOR TODAY?") y
- * Nutrition ("Tell Vora what you ate").
+ * VoraHeroCard: panel destacado verde (#123D35) con radio de 20 dp (patrón "Tarjetas y
+ * paneles" del Figma). Se usa en Home ("VORA Coach / AI ONLINE"), Workout ("READY FOR TODAY?")
+ * y Nutrition ("Tell Vora what you ate").
  *
- * Recibe un "slot" de contenido ([content]) con receptor ColumnScope: cada pantalla
- * decide qué textos y botones poner adentro, pero el estilo queda unificado (UI02).
+ * Recibe un "slot" de contenido ([content]) con receptor ColumnScope: cada pantalla decide
+ * qué textos y botones poner adentro, pero el estilo queda unificado (UI02).
  *
+ * @param contentPadding 20 dp por defecto (Workout); el Home usa 16 dp.
  * @param onClick si no es null, toda la tarjeta es clickeable (NAV01).
  */
 @Composable
 fun VoraHeroCard(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
+    contentPadding: PaddingValues = PaddingValues(20.dp),
     content: @Composable ColumnScope.() -> Unit
 ) {
     // Modifier condicional: solo agrega clickable si hay acción.
@@ -47,18 +53,18 @@ fun VoraHeroCard(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(24.dp))
-            .background(VoraDarkGreen)
+            .clip(RoundedCornerShape(20.dp))
+            .background(VoraGreen)
             .then(clickModifier)
-            .padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+            .padding(contentPadding),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
         content = content
     )
 }
 
 /**
- * Etiqueta superior de las Hero Cards (ej. "AI ONLINE", "READY FOR TODAY?").
- * Muestra un punto lima opcional que simula el indicador "en línea".
+ * Etiqueta superior de los paneles (ej. "READY FOR TODAY?"): 12 Bold en menta (#65D6B0).
+ * Con [showDot] agrega un punto lima que indica "en línea".
  */
 @Composable
 fun VoraHeroLabel(text: String, showDot: Boolean = false) {
@@ -68,30 +74,31 @@ fun VoraHeroLabel(text: String, showDot: Boolean = false) {
                 modifier = Modifier
                     .size(8.dp)
                     .clip(CircleShape)
-                    .background(VoraAccentLime)
+                    .background(VoraLime)
             )
-            androidx.compose.foundation.layout.Spacer(Modifier.size(6.dp))
+            Spacer(Modifier.size(6.dp))
         }
         Text(
             text = text.uppercase(),
-            style = MaterialTheme.typography.labelMedium,
-            color = VoraAccentLime
+            style = MaterialTheme.typography.labelMedium.copy(fontSize = 12.sp, fontWeight = FontWeight.Bold),
+            color = VoraMint
         )
     }
 }
 
 /**
- * Píldora secundaria dentro de una Hero Card (fondo #225046), p. ej. "45 min" o "Intermediate".
+ * Píldora sobre panel oscuro (ej. "AI ONLINE", "45 min"): fondo blanco al 12 %,
+ * texto blanco 11 SemiBold, padding 10/4.
  */
 @Composable
 fun VoraHeroPill(text: String, modifier: Modifier = Modifier) {
     Text(
         text = text,
-        style = MaterialTheme.typography.labelSmall,
+        style = MaterialTheme.typography.labelMedium,
         color = Color.White,
         modifier = modifier
-            .clip(RoundedCornerShape(50))
-            .background(VoraSecondaryGreen)
-            .padding(horizontal = 12.dp, vertical = 6.dp)
+            .clip(VoraPillShape)
+            .background(Color.White.copy(alpha = 0.12f))
+            .padding(horizontal = 10.dp, vertical = 4.dp)
     )
 }

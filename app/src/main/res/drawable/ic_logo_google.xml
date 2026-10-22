@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ícono exportado del Figma de VORA Coach y convertido a VectorDrawable. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="20dp"
+    android:height="20dp"
+    android:viewportWidth="20"
+    android:viewportHeight="20">
+    <path
+        android:pathData="M19.7875 10.225C19.7875 9.64167 19.7375 9.05833 19.6292 8.5H10V12.2583H15.5C15.2583 13.525 14.55 14.6083 13.5 15.325V17.8667H16.7333C18.625 16.125 19.7833 13.5583 19.7833 10.225H19.7875"
+        android:fillColor="#FF4285F4" />
+    <path
+        android:pathData="M10 20C12.7 20 14.9583 19.1 16.6083 17.575L13.375 15.0333C12.475 15.6333 11.3333 16 10 16C7.4 16 5.19167 14.25 4.4 11.8917H1.04167V14.5167C2.71667 17.8 6.11667 20 10 20V20"
+        android:fillColor="#FF34A853" />
+    <path
+        android:pathData="M4.4 11.8917C4.19167 11.2917 4.08333 10.65 4.08333 10C4.08333 9.35 4.19167 8.70833 4.4 8.10833V5.48333H1.04167C0.375 6.80833 0 8.325 0 10C0 11.675 0.375 13.1917 1.04167 14.5167L4.4 11.8917V11.8917"
+        android:fillColor="#FFFBBC05" />
+    <path
+        android:pathData="M10 3.95833C11.475 3.95833 12.7917 4.46667 13.8333 5.45833L16.6833 2.60833C14.9583 0.991667 12.7 0 10 0C6.11667 0 2.71667 2.2 1.04167 5.48333L4.4 8.10833C5.19167 5.75 7.4 3.95833 10 3.95833V3.95833"
+        android:fillColor="#FFEA4335" />
+</vector>

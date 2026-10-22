@@ -1,6 +1,7 @@
 package ar.edu.ort.voracoach.ui.components
 
-// --- Foundation: dibujo, clicks y layouts ---
+// --- Foundation: dibujo, bordes, clicks y layouts ---
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -19,15 +20,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-// --- Íconos ---
+// KeyboardOptions: tipo de teclado (numérico para calorías/macros, email, contraseña).
+import androidx.compose.foundation.text.KeyboardOptions
+// --- Íconos de Material (solo para la flecha ">" de las filas de lista) ---
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 // --- Material 3 ---
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -39,33 +40,41 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
-// KeyboardOptions: tipo de teclado (numérico para calorías/macros).
-import androidx.compose.foundation.text.KeyboardOptions
+// painterResource: carga un VectorDrawable de res/drawable (íconos exportados del Figma).
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-// --- Paleta VORA ---
-import ar.edu.ort.voracoach.ui.theme.VoraAccentLime
-import ar.edu.ort.voracoach.ui.theme.VoraDarkGreen
-import ar.edu.ort.voracoach.ui.theme.VoraDivider
-import ar.edu.ort.voracoach.ui.theme.VoraLightMint
-import ar.edu.ort.voracoach.ui.theme.VoraLightMintBorder
+import androidx.compose.ui.unit.sp
+import ar.edu.ort.voracoach.R
+// --- Paleta VORA (valores del sistema de diseño del Figma) ---
+import ar.edu.ort.voracoach.ui.theme.VoraBorder
+import ar.edu.ort.voracoach.ui.theme.VoraGreen
+import ar.edu.ort.voracoach.ui.theme.VoraLime
+import ar.edu.ort.voracoach.ui.theme.VoraMintTag
 import ar.edu.ort.voracoach.ui.theme.VoraStatusError
 import ar.edu.ort.voracoach.ui.theme.VoraSurface
 import ar.edu.ort.voracoach.ui.theme.VoraTextPrimary
 import ar.edu.ort.voracoach.ui.theme.VoraTextSecondary
+import ar.edu.ort.voracoach.ui.theme.VoraTextTertiary
 
-/** Padding horizontal estándar de las pantallas (márgenes laterales de Figma). */
+/** Margen lateral estándar de las pantallas (20 dp: 20 + 350 + 20 = 390 del Figma). */
 val VoraScreenPadding = 20.dp
+
+/** Forma de píldora (radio 100 del Figma) para botones, chips y etiquetas. */
+val VoraPillShape = RoundedCornerShape(100.dp)
 
 /**
  * VoraTopBar: barra superior de pantallas secundarias con botón volver ("<"),
- * título centrado y acciones opcionales a la derecha (NAV03: volver siempre visible).
+ * título y acciones opcionales a la derecha (NAV03: volver siempre visible).
  *
  * @param onBack si es null no se muestra la flecha (pantallas raíz).
+ * @param backIcon ícono alternativo para el botón (por defecto, el chevron del Figma).
  * @param actions slot para íconos de la derecha (campana, ajustes, calendario...).
  */
 @Composable
@@ -73,29 +82,38 @@ fun VoraTopBar(
     title: String,
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
-    backIcon: ImageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+    backIcon: ImageVector? = null,
     actions: @Composable RowScope.() -> Unit = {}
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .height(64.dp)
-            .padding(horizontal = 8.dp),
+            .padding(horizontal = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (onBack != null) {
-            VoraIconCircleButton(icon = backIcon, contentDescription = "Back", onClick = onBack)
+            if (backIcon != null) {
+                VoraIconCircleButton(icon = backIcon, contentDescription = "Back", onClick = onBack)
+            } else {
+                VoraIconCircleButton(
+                    painter = painterResource(R.drawable.ic_chevron_left),
+                    contentDescription = "Back",
+                    onClick = onBack,
+                    iconSize = 18
+                )
+            }
         } else {
-            Spacer(Modifier.width(48.dp))
+            Spacer(Modifier.width(40.dp))
         }
         Text(
             text = title,
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.titleMedium,
             color = VoraTextPrimary,
             modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            textAlign = TextAlign.Center
         )
         Row(
             modifier = Modifier.width(IntrinsicActionsWidth),
@@ -107,11 +125,11 @@ fun VoraTopBar(
 }
 
 /** Ancho reservado a la derecha de la TopBar para que el título quede centrado. */
-private val IntrinsicActionsWidth = 96.dp
+private val IntrinsicActionsWidth = 88.dp
 
 /**
- * Encabezado grande de las pantallas raíz (Home, Workout, Nutrition, Progress, Profile).
- * Título grande a la izquierda, subtítulo opcional y acciones (íconos) a la derecha.
+ * Encabezado grande de las pantallas raíz: título de 24 SemiBold a la izquierda,
+ * subtítulo opcional y acciones a la derecha (ej. "Notifications" + "Mark all as read").
  */
 @Composable
 fun VoraScreenHeader(
@@ -132,12 +150,12 @@ fun VoraScreenHeader(
             }
             Text(title, style = MaterialTheme.typography.headlineMedium, color = VoraTextPrimary)
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), content = actions)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically, content = actions)
     }
 }
 
 /**
- * Botón circular blanco con ícono (campana, calendario, ajustes, volver).
+ * Botón circular blanco con borde sutil (#E4E9E6) e ícono de Material.
  * Siempre requiere onClick: así evitamos botones "muertos" (NAV01).
  */
 @Composable
@@ -149,19 +167,51 @@ fun VoraIconCircleButton(
     containerColor: Color = VoraSurface,
     iconTint: Color = VoraTextPrimary
 ) {
-    IconButton(
-        onClick = onClick,
-        modifier = modifier
-            .size(44.dp)
-            .clip(CircleShape)
-            .background(containerColor)
-    ) {
-        Icon(icon, contentDescription = contentDescription, tint = iconTint)
+    CircleButtonFrame(onClick, modifier, containerColor) {
+        Icon(icon, contentDescription = contentDescription, tint = iconTint, modifier = Modifier.size(20.dp))
     }
 }
 
 /**
- * VoraCard: tarjeta blanca de esquinas 20 dp, base de casi todos los bloques de contenido.
+ * Variante con ícono exportado del Figma (VectorDrawable cargado con painterResource).
+ */
+@Composable
+fun VoraIconCircleButton(
+    painter: Painter,
+    contentDescription: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    containerColor: Color = VoraSurface,
+    iconTint: Color = VoraTextPrimary,
+    iconSize: Int = 20
+) {
+    CircleButtonFrame(onClick, modifier, containerColor) {
+        Icon(painter, contentDescription = contentDescription, tint = iconTint, modifier = Modifier.size(iconSize.dp))
+    }
+}
+
+/** Marco común de los botones circulares: 40 dp, fondo blanco y borde de 1 dp. */
+@Composable
+private fun CircleButtonFrame(
+    onClick: () -> Unit,
+    modifier: Modifier,
+    containerColor: Color,
+    content: @Composable () -> Unit
+) {
+    Box(
+        modifier = modifier
+            .size(40.dp)
+            .clip(CircleShape)
+            .background(containerColor)
+            .border(1.dp, VoraBorder, CircleShape)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) { content() }
+}
+
+/**
+ * VoraCard: tarjeta blanca con borde #E4E9E6 y radio de 16 dp (patrón "tarjeta" del Figma).
+ * Padding interior de 16 dp por defecto.
  */
 @Composable
 fun VoraCard(
@@ -171,20 +221,25 @@ fun VoraCard(
     contentPadding: PaddingValues = PaddingValues(16.dp),
     content: @Composable ColumnScope.() -> Unit
 ) {
+    val shape = RoundedCornerShape(16.dp)
     val clickModifier = if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
+            .clip(shape)
             .background(containerColor)
+            .border(1.dp, VoraBorder, shape)
             .then(clickModifier)
             .padding(contentPadding),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
         content = content
     )
 }
 
-/** Botón primario verde oscuro con texto blanco (acciones principales sobre fondo claro). */
+/**
+ * Botón principal verde (#123D35) en forma de píldora, texto blanco 15 Bold
+ * (muestra "Save changes" del Figma: padding 24/14, ancho completo).
+ */
 @Composable
 fun VoraPrimaryButton(
     text: String,
@@ -196,20 +251,24 @@ fun VoraPrimaryButton(
     Button(
         onClick = onClick,
         enabled = enabled,
-        modifier = modifier.fillMaxWidth().height(54.dp),
-        shape = RoundedCornerShape(16.dp),
+        modifier = modifier.fillMaxWidth(),
+        shape = VoraPillShape,
+        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 14.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = VoraDarkGreen,
+            containerColor = VoraGreen,
             contentColor = Color.White,
-            disabledContainerColor = VoraDarkGreen.copy(alpha = 0.35f),
+            disabledContainerColor = VoraGreen.copy(alpha = 0.35f),
             disabledContentColor = Color.White
         )
     ) {
-        ButtonContent(text, icon)
+        ButtonContent(text, icon, fontSize = 15, bold = true)
     }
 }
 
-/** Botón CTA lima (#C6E854) con texto #103B31: se usa sobre las Hero Cards oscuras. */
+/**
+ * CTA lima (#C9E86A) con texto verde (#123D35) 14 SemiBold: va sobre paneles oscuros
+ * ("Start Workout", "Start voice session").
+ */
 @Composable
 fun VoraLimeButton(
     text: String,
@@ -219,18 +278,19 @@ fun VoraLimeButton(
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier.height(50.dp),
-        shape = RoundedCornerShape(16.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = VoraAccentLime,
-            contentColor = VoraDarkGreen
-        )
+        modifier = modifier,
+        shape = VoraPillShape,
+        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = VoraLime, contentColor = VoraGreen)
     ) {
-        ButtonContent(text, icon)
+        ButtonContent(text, icon, fontSize = 14, bold = false)
     }
 }
 
-/** Sub-botón verde secundario (#225046) dentro de Hero Cards. */
+/**
+ * Acción secundaria sobre panel oscuro ("Details"): fondo transparente,
+ * borde blanco al 25 % y texto blanco 14 SemiBold.
+ */
 @Composable
 fun VoraHeroSecondaryButton(
     text: String,
@@ -238,55 +298,60 @@ fun VoraHeroSecondaryButton(
     modifier: Modifier = Modifier,
     icon: ImageVector? = null
 ) {
-    Button(
+    OutlinedButton(
         onClick = onClick,
-        modifier = modifier.height(50.dp),
-        shape = RoundedCornerShape(16.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = ar.edu.ort.voracoach.ui.theme.VoraSecondaryGreen,
-            contentColor = Color.White
-        )
+        modifier = modifier,
+        shape = VoraPillShape,
+        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.25f)),
+        colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.Transparent, contentColor = Color.White)
     ) {
-        ButtonContent(text, icon)
+        ButtonContent(text, icon, fontSize = 14, bold = false)
     }
 }
 
-/** Botón secundario con borde (Cancel, Edit, Skip...). */
+/**
+ * Botón con borde #E4E9E6 en forma de píldora ("Not Now", "Cancel").
+ */
 @Composable
 fun VoraOutlinedButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    contentColor: Color = VoraDarkGreen,
+    contentColor: Color = VoraTextSecondary,
     icon: ImageVector? = null
 ) {
     OutlinedButton(
         onClick = onClick,
-        modifier = modifier.fillMaxWidth().height(54.dp),
-        shape = RoundedCornerShape(16.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, VoraLightMintBorder),
-        colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = VoraSurface,
-            contentColor = contentColor
-        )
+        modifier = modifier.fillMaxWidth(),
+        shape = VoraPillShape,
+        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 14.dp),
+        border = BorderStroke(1.dp, VoraBorder),
+        colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.Transparent, contentColor = contentColor)
     ) {
-        ButtonContent(text, icon)
+        ButtonContent(text, icon, fontSize = 15, bold = false)
     }
 }
 
 /** Contenido compartido de los botones: ícono opcional + texto. */
 @Composable
-private fun ButtonContent(text: String, icon: ImageVector?) {
+private fun ButtonContent(text: String, icon: ImageVector?, fontSize: Int, bold: Boolean) {
     if (icon != null) {
-        Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp))
+        Icon(icon, contentDescription = null, modifier = Modifier.size(16.dp))
         Spacer(Modifier.width(8.dp))
     }
-    Text(text, style = MaterialTheme.typography.labelLarge)
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelLarge.copy(
+            fontSize = fontSize.sp,
+            fontWeight = if (bold) androidx.compose.ui.text.font.FontWeight.Bold else androidx.compose.ui.text.font.FontWeight.SemiBold
+        )
+    )
 }
 
 /**
- * Encabezado de sección: título a la izquierda y acción tipo link a la derecha
- * ("See all", "Edit"). Si [actionText] es null no se muestra la acción.
+ * Encabezado de sección: título 16 SemiBold y acción contextual 13 SemiBold verde
+ * ("View History", "See all"). Si [actionText] es null no se muestra la acción.
  */
 @Composable
 fun VoraSectionHeader(
@@ -300,12 +365,12 @@ fun VoraSectionHeader(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(title, style = MaterialTheme.typography.titleLarge, color = VoraTextPrimary)
+        Text(title, style = MaterialTheme.typography.titleSmall.copy(fontSize = 16.sp), color = VoraTextPrimary)
         if (actionText != null && onAction != null) {
             Text(
                 text = actionText,
-                style = MaterialTheme.typography.titleSmall,
-                color = ar.edu.ort.voracoach.ui.theme.VoraMintProgress,
+                style = MaterialTheme.typography.titleSmall.copy(fontSize = 13.sp),
+                color = VoraGreen,
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
                     .clickable(onClick = onAction)
@@ -316,8 +381,8 @@ fun VoraSectionHeader(
 }
 
 /**
- * Fila de lista con ícono en círculo menta, título, subtítulo y flecha ">".
- * Se usa en Perfil, Notificaciones, Ajustes y listados de comidas/ejercicios.
+ * Fila de lista: ícono en cuadro menta, título, subtítulo y flecha ">".
+ * Se usa en Perfil, Ajustes y listados.
  */
 @Composable
 fun VoraListRow(
@@ -325,8 +390,8 @@ fun VoraListRow(
     modifier: Modifier = Modifier,
     subtitle: String? = null,
     icon: ImageVector? = null,
-    iconTint: Color = VoraDarkGreen,
-    iconBackground: Color = VoraLightMint,
+    iconTint: Color = VoraGreen,
+    iconBackground: Color = VoraMintTag,
     titleColor: Color = VoraTextPrimary,
     showChevron: Boolean = true,
     onClick: (() -> Unit)? = null,
@@ -336,7 +401,7 @@ fun VoraListRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(12.dp))
             .then(clickModifier)
             .padding(vertical = 10.dp, horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -344,17 +409,14 @@ fun VoraListRow(
     ) {
         if (icon != null) {
             Box(
-                modifier = Modifier
-                    .size(42.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(iconBackground),
+                modifier = Modifier.size(36.dp).clip(CircleShape).background(iconBackground),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(22.dp))
+                Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(18.dp))
             }
         }
         Column(modifier = Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.titleMedium, color = titleColor)
+            Text(title, style = MaterialTheme.typography.titleSmall, color = titleColor)
             if (subtitle != null) {
                 Text(subtitle, style = MaterialTheme.typography.bodySmall, color = VoraTextSecondary)
             }
@@ -362,29 +424,25 @@ fun VoraListRow(
         if (trailing != null) {
             trailing()
         } else if (showChevron && onClick != null) {
-            Icon(
-                Icons.AutoMirrored.Rounded.KeyboardArrowRight,
-                contentDescription = null,
-                tint = VoraTextSecondary
-            )
+            Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = null, tint = VoraTextTertiary)
         }
     }
 }
 
-/** Línea divisoria sutil entre filas. */
+/** Línea divisoria de 1 dp (#E4E9E6). */
 @Composable
 fun VoraDividerLine(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxWidth()
             .height(1.dp)
-            .background(VoraDivider)
+            .background(VoraBorder)
     )
 }
 
 /**
- * Chip seleccionable (filtros de tipo de comida, días de la semana, objetivos).
- * Seleccionado: fondo verde oscuro + texto blanco. No seleccionado: blanco con borde menta.
+ * Chip tipo "prompt" del Figma: blanco con borde #E4E9E6, píldora, texto 13 Medium.
+ * Seleccionado: fondo verde #123D35 y texto blanco.
  */
 @Composable
 fun VoraChip(
@@ -393,22 +451,22 @@ fun VoraChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val shape = RoundedCornerShape(50)
     Text(
         text = text,
-        style = MaterialTheme.typography.titleSmall,
+        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Medium),
         color = if (selected) Color.White else VoraTextPrimary,
         modifier = modifier
-            .clip(shape)
-            .background(if (selected) VoraDarkGreen else VoraSurface)
-            .border(1.dp, if (selected) VoraDarkGreen else VoraLightMintBorder, shape)
+            .clip(VoraPillShape)
+            .background(if (selected) VoraGreen else VoraSurface)
+            .border(1.dp, if (selected) VoraGreen else VoraBorder, VoraPillShape)
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 10.dp)
+            .padding(horizontal = 14.dp, vertical = 8.dp)
     )
 }
 
 /**
- * Mosaico de estadística: ícono, valor grande y etiqueta ("8,432 Steps", "45 min").
+ * Mosaico de estadística: etiqueta 11 en mayúsculas (texto tenue) y valor 16 Bold
+ * (patrón "STEPS / 7,842" del Home).
  */
 @Composable
 fun VoraStatTile(
@@ -418,26 +476,21 @@ fun VoraStatTile(
     icon: ImageVector? = null,
     onClick: (() -> Unit)? = null
 ) {
-    VoraCard(modifier = modifier, onClick = onClick) {
+    VoraCard(modifier = modifier, onClick = onClick, contentPadding = PaddingValues(12.dp)) {
         if (icon != null) {
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(VoraLightMint),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(icon, contentDescription = null, tint = VoraDarkGreen, modifier = Modifier.size(20.dp))
-            }
+            Icon(icon, contentDescription = null, tint = VoraGreen, modifier = Modifier.size(18.dp))
         }
-        Text(value, style = MaterialTheme.typography.titleLarge, color = VoraTextPrimary)
-        Text(label, style = MaterialTheme.typography.bodySmall, color = VoraTextSecondary)
+        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(label.uppercase(), style = MaterialTheme.typography.labelMedium.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Normal), color = VoraTextTertiary)
+            Text(value, style = MaterialTheme.typography.titleSmall.copy(fontSize = 16.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), color = VoraTextPrimary)
+        }
     }
 }
 
 /**
- * Campo de texto con el estilo VORA (bordes redondeados, foco verde oscuro y
- * mensaje de error en rojo debajo cuando [errorText] no es null).
+ * Campo de formulario del Figma (Edit profile): etiqueta en mayúsculas 11 SemiBold arriba,
+ * separada 6 dp del campo blanco con borde #E4E9E6, radio 12 y valor 15 Regular.
+ * Si [errorText] no es null el borde pasa a rojo y se muestra el mensaje debajo.
  */
 @Composable
 fun VoraTextField(
@@ -452,55 +505,50 @@ fun VoraTextField(
     singleLine: Boolean = true,
     leadingIcon: ImageVector? = null
 ) {
-    Column(modifier = modifier.fillMaxWidth()) {
+    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(label.uppercase(), style = MaterialTheme.typography.labelMedium, color = VoraTextSecondary)
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
-            label = { Text(label) },
-            placeholder = placeholder?.let { { Text(it) } },
+            placeholder = placeholder?.let { { Text(it, style = MaterialTheme.typography.bodyLarge, color = VoraTextTertiary) } },
             singleLine = singleLine,
             isError = errorText != null,
-            leadingIcon = leadingIcon?.let { { Icon(it, contentDescription = null) } },
+            textStyle = MaterialTheme.typography.bodyLarge.copy(color = VoraTextPrimary),
+            leadingIcon = leadingIcon?.let { { Icon(it, contentDescription = null, tint = VoraTextSecondary) } },
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
             visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = VoraDarkGreen,
-                unfocusedBorderColor = VoraLightMintBorder,
-                focusedLabelColor = VoraDarkGreen,
-                cursorColor = VoraDarkGreen,
+                focusedBorderColor = VoraGreen,
+                unfocusedBorderColor = VoraBorder,
+                cursorColor = VoraGreen,
                 focusedContainerColor = VoraSurface,
                 unfocusedContainerColor = VoraSurface,
                 errorBorderColor = VoraStatusError,
-                errorLabelColor = VoraStatusError
+                errorContainerColor = VoraSurface
             ),
             modifier = Modifier.fillMaxWidth()
         )
         if (errorText != null) {
-            Text(
-                text = errorText,
-                color = VoraStatusError,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(start = 12.dp, top = 4.dp)
-            )
+            Text(text = errorText, color = VoraStatusError, style = MaterialTheme.typography.bodySmall)
         }
     }
 }
 
-/** Etiqueta pequeña tipo "badge" (ej. "Demo", "Offline", "Intermediate"). */
+/** Etiqueta compacta en píldora (patrón "ONLINE": menta al 15 % y texto verde 11 SemiBold). */
 @Composable
 fun VoraBadge(
     text: String,
     modifier: Modifier = Modifier,
-    containerColor: Color = VoraLightMint,
-    contentColor: Color = VoraDarkGreen
+    containerColor: Color = VoraMintTag,
+    contentColor: Color = VoraGreen
 ) {
     Text(
         text = text,
-        style = MaterialTheme.typography.labelSmall,
+        style = MaterialTheme.typography.labelMedium,
         color = contentColor,
         modifier = modifier
-            .clip(RoundedCornerShape(50))
+            .clip(VoraPillShape)
             .background(containerColor)
             .padding(horizontal = 10.dp, vertical = 4.dp)
     )
