@@ -11,17 +11,12 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 /**
- * Endpoints de nutrición del mock (opcionales: búsqueda de alimentos y análisis simulado).
- * Las comidas NO se guardan en el servidor: el registro se hace en Room (RF03, RF04).
- *
- * Igual que WorkoutApiService, devuelven Response<...> para poder revisar el código HTTP.
+ * Endpoints opcionales de nutrición. Las comidas no se mandan al servidor: se guardan en Room.
+ * Devuelven Response<...> para que el repositorio pueda distinguir 400, 404 o 503.
  */
 interface NutritionApiService {
 
-    /**
-     * Búsqueda: GET {BASE_URL}v1/foods?q=&page=&pageSize= -> {"data": [...], "meta": {...}}
-     * @Query agrega cada parámetro a la URL; si vale null, Retrofit no lo manda.
-     */
+    /** Los parámetros null no se mandan: sin q trae todos los alimentos. */
     @GET("v1/foods")
     suspend fun searchFoods(
         @Query("q") query: String? = null,
@@ -29,10 +24,6 @@ interface NutritionApiService {
         @Query("pageSize") pageSize: Int? = null
     ): Response<FoodSearchResponseDto>
 
-    /**
-     * Análisis simulado: POST {BASE_URL}v1/nutrition/analyses -> {"data": { ... }}
-     * @Body convierte el objeto a JSON con Gson y lo manda como cuerpo del pedido.
-     */
     @POST("v1/nutrition/analyses")
     suspend fun analyzeMeal(
         @Body request: NutritionAnalysisRequestDto

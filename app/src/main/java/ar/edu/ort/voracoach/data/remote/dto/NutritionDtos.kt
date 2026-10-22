@@ -7,14 +7,8 @@ import ar.edu.ort.voracoach.model.Macros
 import ar.edu.ort.voracoach.model.NutritionAnalysis
 import com.google.gson.annotations.SerializedName
 
-// =====================================================================================
-// DTOs del flujo 5 (Nutrición): copia EXACTA del JSON del mock (RF06).
-// Endpoints opcionales del contrato: búsqueda de alimentos y análisis simulado.
-// Todos los campos son nullables (?): si el servidor manda un JSON incompleto,
-// la app no se cae.
-// =====================================================================================
+// Campos nullables: un JSON incompleto no rompe el parseo; los mappers completan o descartan.
 
-/** Macros de una porción: {"kcal": 389, "proteinG": 16.9, "carbsG": 66.3, "fatG": 6.9}. */
 data class NutritionDto(
     @SerializedName("kcal") val kcal: Double?,
     @SerializedName("proteinG") val proteinG: Double?,
@@ -22,23 +16,18 @@ data class NutritionDto(
     @SerializedName("fatG") val fatG: Double?
 )
 
-/** Un alimento de GET /v1/foods. Los macros son cada 100 g. */
 data class FoodDto(
     @SerializedName("id") val id: String?,
     @SerializedName("name") val name: String?,
     @SerializedName("nutritionPer100g") val nutritionPer100g: NutritionDto?
 )
 
-/**
- * Respuesta de GET /v1/foods: además de "data" trae "meta" con la paginación,
- * por eso no alcanza con ApiResponseDto.
- */
+/** Además de "data" trae "meta" con la paginación, por eso no alcanza con ApiResponseDto. */
 data class FoodSearchResponseDto(
     @SerializedName("data") val data: List<FoodDto>?,
     @SerializedName("meta") val meta: PageMetaDto?
 )
 
-/** Paginación: página actual, tamaño de página y total de resultados. */
 data class PageMetaDto(
     @SerializedName("page") val page: Int?,
     @SerializedName("pageSize") val pageSize: Int?,
@@ -46,9 +35,8 @@ data class PageMetaDto(
 )
 
 /**
- * Cuerpo de POST /v1/nutrition/analyses.
- * source: "text" (requiere text) o "photo" (el mock usa una foto de ejemplo, no se sube nada).
- * preset: "breakfast", "lunch" o "vegetarian"; si es null el mock usa "breakfast".
+ * Con source "text" el servidor exige text (si falta responde 400); con "photo" usa una
+ * foto de ejemplo. Sin preset usa "breakfast".
  */
 data class NutritionAnalysisRequestDto(
     @SerializedName("source") val source: String,
@@ -56,7 +44,6 @@ data class NutritionAnalysisRequestDto(
     @SerializedName("preset") val preset: String? = null
 )
 
-/** Respuesta de POST /v1/nutrition/analyses: estimación simulada que se confirma antes de guardar. */
 data class NutritionAnalysisDto(
     @SerializedName("source") val source: String?,
     @SerializedName("preset") val preset: String?,
@@ -66,7 +53,6 @@ data class NutritionAnalysisDto(
     @SerializedName("totals") val totals: NutritionDto?
 )
 
-/** Un alimento detectado en el análisis, con los gramos estimados. */
 data class AnalysisItemDto(
     @SerializedName("foodId") val foodId: String?,
     @SerializedName("name") val name: String?,
@@ -76,7 +62,7 @@ data class AnalysisItemDto(
 
 // ------------------------------- Mappers DTO -> modelo -------------------------------
 
-/** Si falta algún macro queda en 0: es preferible a descartar el alimento entero. */
+/** Un macro faltante queda en 0: es preferible a descartar el alimento entero. */
 fun NutritionDto.toDomain(): Macros = Macros(
     kcal = kcal ?: 0.0,
     proteinG = proteinG ?: 0.0,
@@ -84,7 +70,7 @@ fun NutritionDto.toDomain(): Macros = Macros(
     fatG = fatG ?: 0.0
 )
 
-/** Devuelve null si falta el id o el nombre: sin esos datos no se puede mostrar ni elegir. */
+/** null si falta el id o el nombre: sin ellos el alimento no se puede mostrar ni elegir. */
 fun FoodDto.toDomain(): Food? {
     if (id == null || name == null) return null
     return Food(
@@ -95,7 +81,6 @@ fun FoodDto.toDomain(): Food? {
 }
 
 fun FoodSearchResponseDto.toDomain(): FoodPage {
-    // mapNotNull: convierte cada alimento y DESCARTA los que vienen rotos (null)
     val foods = data.orEmpty().mapNotNull { it.toDomain() }
     return FoodPage(
         foods = foods,
