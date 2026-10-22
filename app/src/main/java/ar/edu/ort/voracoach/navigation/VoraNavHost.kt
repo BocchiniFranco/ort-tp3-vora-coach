@@ -1,7 +1,19 @@
 package ar.edu.ort.voracoach.navigation
 
+// Activity: para acceder a la ventana y cambiar el color de los íconos de la barra de estado.
+import android.app.Activity
+// Build: para aplicar isNavigationBarContrastEnforced solo desde Android 10 (API 29).
+import android.os.Build
 // Layout: Box contenedor, fondo y padding provisto por el Scaffold.
 import androidx.compose.foundation.background
+// SideEffect: ejecuta código no-Compose (la ventana de Android) después de cada recomposición.
+import androidx.compose.runtime.SideEffect
+// LocalView: la View de Android que aloja a Compose (de ella sale la ventana).
+import androidx.compose.ui.platform.LocalView
+// WindowCompat: controla la apariencia de las barras del sistema de forma compatible.
+import androidx.core.view.WindowCompat
+import ar.edu.ort.voracoach.ui.theme.AuthBackground
+import ar.edu.ort.voracoach.ui.theme.VoraGreen
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -63,9 +75,33 @@ fun VoraNavHost(
     val currentRoute = backStackEntry?.destination?.route
     val showBottomBar = currentRoute in Screen.bottomBarRoutes
 
+    // Color de fondo detrás de la barra de estado: acompaña a la pantalla actual
+    // (verde en los estados oscuros del asistente, menta claro en el acceso).
+    val screenBackground = when (currentRoute) {
+        in darkRoutes -> VoraGreen
+        in authRoutes -> AuthBackground
+        else -> VoraBackground
+    }
+    // Íconos de las barras del sistema claros sobre fondo oscuro y oscuros sobre fondo claro.
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        val lightStatusBarIcons = currentRoute in darkRoutes
+        SideEffect {
+            val window = (view.context as? Activity)?.window ?: return@SideEffect
+            val insetsController = WindowCompat.getInsetsController(window, view)
+            insetsController.isAppearanceLightStatusBars = !lightStatusBarIcons
+            insetsController.isAppearanceLightNavigationBars = !lightStatusBarIcons
+            // Sin el velo gris que Android agrega a la navegación por botones: la barra del
+            // sistema toma el mismo fondo que la pantalla (verde en los estados oscuros).
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                window.isNavigationBarContrastEnforced = false
+            }
+        }
+    }
+
     Scaffold(
         modifier = modifier,
-        containerColor = VoraBackground,
+        containerColor = screenBackground,
         bottomBar = {
             if (showBottomBar) {
                 VoraBottomBar(
@@ -82,7 +118,7 @@ fun VoraNavHost(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(VoraBackground)
+                .background(screenBackground)
                 .padding(innerPadding)
         ) {
             NavHost(
@@ -107,4 +143,13 @@ fun VoraNavHost(
  * Función de extensión sobre String?: se lee como currentRoute.toBottomDestination().
  */
 private fun String?.toBottomDestination(): VoraBottomDestination? =
-    VoraBottomDestination.entries.firstOrNull { it.route() == this }
+    if (this == Screen.Notifications.route) VoraBottomDestination.HOME
+    else VoraBottomDestination.entries.firstOrNull { it.route() == this }
+
+/** Pantallas con fondo verde oscuro en el Figma (Voice / Listening, Processing y Speaking). */
+private val darkRoutes: Set<String>
+    get() = setOf(Screen.CoachListening.route, Screen.CoachProcessing.route, Screen.CoachVoiceResponse.route)
+
+/** Pantallas de acceso, con fondo #F3F9F5. */
+private val authRoutes: Set<String>
+    get() = setOf(Screen.Login.route, Screen.Register.route)
