@@ -48,21 +48,20 @@ class AuthViewModel @Inject constructor() : ViewModel() {
     }
 
     /**
-     * 1.2 Register: valida nombre, email, contraseña y confirmación.
+     * 1.2 Register: valida los tres campos del Figma (Full Name, Email Address, Password).
      */
-    fun register(name: String, email: String, password: String, confirmPassword: String) {
+    fun register(name: String, email: String, password: String) {
         val nameError = if (name.isBlank()) "Enter your name" else null
         val emailError = validateEmail(email)
         val passwordError = validatePassword(password)
-        val confirmError = if (confirmPassword != password) "Passwords don't match" else null
-        if (listOf(nameError, emailError, passwordError, confirmError).any { it != null }) {
-            _uiState.value = AuthUiState.Error(nameError, emailError, passwordError, confirmError)
+        if (listOf(nameError, emailError, passwordError).any { it != null }) {
+            _uiState.value = AuthUiState.Error(nameError, emailError, passwordError)
             return
         }
         simulateAuthentication()
     }
 
-    /** Ingreso de demostración (botón "Continue as Alex Morgan"). */
+    /** Ingreso de demostración con Apple, Google o Face ID (sin OAuth real). */
     fun signInAsDemoUser() = simulateAuthentication()
 
     /**
@@ -107,6 +106,7 @@ class AuthViewModel @Inject constructor() : ViewModel() {
     // companion object: constantes compartidas por todas las instancias.
     private companion object {
         const val SIMULATED_DELAY_MS = 700L
-        const val MIN_PASSWORD_LENGTH = 6
+        // "8+ secure characters" / "At least 8 characters" según el Figma de Register.
+        const val MIN_PASSWORD_LENGTH = 8
     }
 }
