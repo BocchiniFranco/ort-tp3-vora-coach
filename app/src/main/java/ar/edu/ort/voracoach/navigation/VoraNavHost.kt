@@ -142,9 +142,11 @@ fun VoraNavHost(
  * Convierte la ruta actual en el destino a resaltar en la BottomBar.
  * Función de extensión sobre String?: se lee como currentRoute.toBottomDestination().
  */
-private fun String?.toBottomDestination(): VoraBottomDestination? =
-    if (this == Screen.Notifications.route) VoraBottomDestination.HOME
-    else VoraBottomDestination.entries.firstOrNull { it.route() == this }
+private fun String?.toBottomDestination(): VoraBottomDestination? = when (this) {
+    Screen.Notifications.route -> VoraBottomDestination.HOME
+    Screen.AddFood.route -> VoraBottomDestination.NUTRITION
+    else -> VoraBottomDestination.entries.firstOrNull { it.route() == this }
+}
 
 /** Pantallas con fondo verde oscuro en el Figma (Voice / Listening, Processing y Speaking). */
 private val darkRoutes: Set<String>

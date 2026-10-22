@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ícono exportado del Figma de VORA Coach y convertido a VectorDrawable. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="20dp"
+    android:height="20dp"
+    android:viewportWidth="20"
+    android:viewportHeight="20">
+    <group
+        android:translateX="5.916"
+        android:translateY="5.916">
+        <path
+            android:pathData="M0 4.0838H8.1676M4.0838 8.1676L8.1676 4.0838L4.0838 0"
+            android:strokeColor="#FF9AA39F"
+            android:strokeWidth="2"
+            android:strokeLineCap="round" />
+    </group>
+</vector>
