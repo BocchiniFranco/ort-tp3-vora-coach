@@ -252,8 +252,10 @@ sealed class Screen(
                 ProfileDashboard.route,
                 // En el Figma, Notifications también muestra la barra (con Home activo).
                 Notifications.route,
-                // Y Add Food, con Nutrition activo.
-                AddFood.route
+                // Y estas pantallas de Nutrición, con Nutrition activo.
+                DailyMeals.route,
+                AddFood.route,
+                MealDetail.route
             )
         }
 

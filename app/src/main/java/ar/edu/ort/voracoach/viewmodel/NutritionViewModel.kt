@@ -22,7 +22,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -32,8 +34,8 @@ import kotlin.math.roundToInt
 
 /**
  * Registro de comidas del flujo de Nutrición. Cada pantalla recibe su propia instancia;
- * la fecha y el tipo de comida llegan como argumentos de la ruta (si faltan: hoy y el
- * tipo que corresponde a la hora).
+ * la fecha, el tipo de comida y el id llegan como argumentos de la ruta (si faltan la
+ * fecha y el tipo: hoy y el tipo que corresponde a la hora).
  */
 @HiltViewModel
 class NutritionViewModel @Inject constructor(
@@ -113,6 +115,118 @@ class NutritionViewModel @Inject constructor(
             "You're on track today. A protein-rich dinner would help you reach your target."
         else ->
             "Great job! You've hit your protein target for today."
+    }
+
+    // ---------------------------------- Detalle (5.8) ----------------------------------
+
+    private val mealId: Long? = savedStateHandle.get<Long>(Screen.ARG_MEAL_ID)
+
+    /**
+     * La comida se identifica por fecha y tipo, no por el id abierto: así, si se elimina
+     * ese ítem, el detalle sigue mostrando los demás de la misma comida.
+     */
+    private val mealGroupKey = MutableStateFlow<Pair<String, MealType>?>(null)
+    private val mealNotFound = MutableStateFlow(false)
+
+    init {
+        mealId?.let { id ->
+            viewModelScope.launch {
+                val meal = repository.observeMeal(id).first()
+                if (meal == null) mealNotFound.value = true
+                else mealGroupKey.value = meal.date to meal.mealType
+            }
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val mealDetailState: StateFlow<MealDetailUiState> = combine(mealGroupKey, mealNotFound) { key, notFound ->
+        key to notFound
+    }
+        .flatMapLatest { (key, notFound) ->
+            when {
+                notFound -> flowOf(MealDetailUiState.NotFound)
+                key == null -> flowOf(MealDetailUiState.Loading)
+                else -> {
+                    val (date, type) = key
+                    combine(repository.observeMeals(date), repository.observeDailyTotals(date)) { meals, day ->
+                        val items = meals.filter { it.mealType == type }
+                        if (items.isEmpty()) {
+                            MealDetailUiState.NotFound
+                        } else {
+                            MealDetailUiState.Content(
+                                group = MealGroup(type, items),
+                                date = date,
+                                time = MealDates.timeLabel(items.minOf { it.createdAt }),
+                                totals = DailyTotals(
+                                    calories = items.sumOf { it.calories },
+                                    protein = items.sumOf { it.protein },
+                                    carbs = items.sumOf { it.carbs },
+                                    fat = items.sumOf { it.fat },
+                                    mealCount = items.size
+                                ),
+                                goals = goals,
+                                tip = proteinTipFor(day)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), MealDetailUiState.Loading)
+
+    private fun proteinTipFor(day: DailyTotals): String {
+        val missing = (goals.protein - day.protein).roundToInt()
+        return if (missing > 0) {
+            "Great protein choice. You're now ${missing}g away from your daily protein target."
+        } else {
+            "Great protein choice. You've reached your daily protein target."
+        }
+    }
+
+    // ---------------------------- Baja con confirmación (5.8) ----------------------------
+
+    private val _mealPendingDelete = MutableStateFlow<Meal?>(null)
+
+    /** Ítem que espera confirmación. Está en el ViewModel para que el diálogo sobreviva a la rotación. */
+    val mealPendingDelete: StateFlow<Meal?> = _mealPendingDelete.asStateFlow()
+
+    fun requestDelete(meal: Meal) {
+        _mealPendingDelete.value = meal
+    }
+
+    fun dismissDelete() {
+        _mealPendingDelete.value = null
+    }
+
+    fun confirmDelete() {
+        val meal = _mealPendingDelete.value ?: return
+        _mealPendingDelete.value = null
+        viewModelScope.launch { repository.deleteMeal(meal.id) }
+    }
+
+    private val _message = MutableStateFlow<String?>(null)
+
+    /** Mensaje breve para un Snackbar; la pantalla lo marca como mostrado. */
+    val message: StateFlow<String?> = _message.asStateFlow()
+
+    fun onMessageShown() {
+        _message.value = null
+    }
+
+    /** "Duplicate Meal": copia los ítems de la comida al día de hoy, con el mismo tipo. */
+    fun duplicateMeal() {
+        val content = mealDetailState.value as? MealDetailUiState.Content ?: return
+        viewModelScope.launch {
+            val today = MealDates.today()
+            val failed = content.group.meals
+                .map { repository.addMeal(it.copy(date = today)) }
+                .any { it.isFailure }
+            _message.value = if (failed) {
+                "We couldn't duplicate this meal. Please try again."
+            } else {
+                "${content.group.type.label} added to today's log."
+            }
+        }
     }
 
     // ----------------------------------- Hojas de 5.3 -----------------------------------

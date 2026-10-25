@@ -67,7 +67,6 @@ import ar.edu.ort.voracoach.ui.theme.VoraTextSecondary
 import ar.edu.ort.voracoach.ui.theme.VoraTextTertiary
 import ar.edu.ort.voracoach.viewmodel.MealGroup
 import ar.edu.ort.voracoach.viewmodel.NutritionDayUiState
-import java.util.Locale
 import kotlin.math.roundToInt
 
 /** 5.1 Nutrition Dashboard (Figma "Nutrition / 01 — Dashboard"): totales y comidas del día desde Room. */
@@ -77,7 +76,7 @@ fun NutritionDashboardScreen(
     onDaySelected: (Long) -> Unit,
     onTipClick: () -> Unit,
     onViewHistoryClick: () -> Unit,
-    onMealGroupClick: (MealType) -> Unit,
+    onMealGroupClick: (MealGroup) -> Unit,
     onAddMealClick: (MealType) -> Unit,
     onVoiceClick: () -> Unit,
     onPhotoClick: () -> Unit,
@@ -107,7 +106,7 @@ fun NutritionDashboardScreen(
                 uiState.groups.forEach { group ->
                     MealGroupRow(
                         group = group,
-                        onClick = { onMealGroupClick(group.type) },
+                        onClick = { onMealGroupClick(group) },
                         onAddClick = { onAddMealClick(group.type) }
                     )
                 }
@@ -340,9 +339,6 @@ private fun RowScope.TellVoraButton(
         )
     }
 }
-
-/** 1420.0 -> "1,420", como en el Figma. */
-private fun Double.thousands(): String = String.format(Locale.US, "%,d", roundToInt())
 
 @Preview(showBackground = true, widthDp = 390, heightDp = 1013)
 @Composable

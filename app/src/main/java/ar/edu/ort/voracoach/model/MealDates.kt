@@ -49,6 +49,9 @@ object MealDates {
             .uppercase(Locale.US)
     }
 
+    /** Hora local de carga, como "13:12" en el detalle de la comida. */
+    fun timeLabel(millis: Long): String = SimpleDateFormat("HH:mm", Locale.US).format(millis)
+
     /** Tipo de comida que corresponde a la hora actual, para precargar el formulario. */
     fun suggestedMealType(): MealType = when (Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
         in 0..10 -> MealType.BREAKFAST

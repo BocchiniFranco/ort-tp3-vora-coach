@@ -144,7 +144,7 @@ fun VoraNavHost(
  */
 private fun String?.toBottomDestination(): VoraBottomDestination? = when (this) {
     Screen.Notifications.route -> VoraBottomDestination.HOME
-    Screen.AddFood.route -> VoraBottomDestination.NUTRITION
+    Screen.DailyMeals.route, Screen.AddFood.route, Screen.MealDetail.route -> VoraBottomDestination.NUTRITION
     else -> VoraBottomDestination.entries.firstOrNull { it.route() == this }
 }
 

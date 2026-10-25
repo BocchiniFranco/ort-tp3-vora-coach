@@ -14,6 +14,23 @@ data class MealGroup(val type: MealType, val meals: List<Meal>) {
     val summary: String get() = meals.joinToString(" · ") { it.name }
 }
 
+/** 5.8: la comida (Breakfast, Lunch...) a la que pertenece el ítem abierto. */
+sealed interface MealDetailUiState {
+    data object Loading : MealDetailUiState
+
+    /** El ítem no existe o se eliminaron todos los de la comida: la pantalla vuelve atrás. */
+    data object NotFound : MealDetailUiState
+
+    data class Content(
+        val group: MealGroup,
+        val date: String,
+        val time: String,
+        val totals: DailyTotals,
+        val goals: NutritionGoals,
+        val tip: String
+    ) : MealDetailUiState
+}
+
 data class NutritionDayUiState(
     val date: String,
     val isToday: Boolean,
