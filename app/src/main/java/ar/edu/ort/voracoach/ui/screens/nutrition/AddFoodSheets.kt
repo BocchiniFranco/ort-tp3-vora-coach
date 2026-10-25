@@ -288,7 +288,7 @@ private fun DateField(date: String, onClick: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun MealDatePickerDialog(
+internal fun MealDatePickerDialog(
     date: String,
     onDateSelected: (Long) -> Unit,
     onDismiss: () -> Unit

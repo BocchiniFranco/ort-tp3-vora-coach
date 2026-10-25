@@ -1,7 +1,28 @@
 package ar.edu.ort.voracoach.viewmodel
 
+import ar.edu.ort.voracoach.model.DailyTotals
 import ar.edu.ort.voracoach.model.Food
+import ar.edu.ort.voracoach.model.Meal
 import ar.edu.ort.voracoach.model.MealType
+import ar.edu.ort.voracoach.model.NutritionGoals
+
+/** Comidas de un tipo (Breakfast, Lunch...) en un día. */
+data class MealGroup(val type: MealType, val meals: List<Meal>) {
+    val calories: Double get() = meals.sumOf { it.calories }
+
+    /** Nombres separados por " · ", como "Greek yoghurt · berries · granola" en el Figma. */
+    val summary: String get() = meals.joinToString(" · ") { it.name }
+}
+
+data class NutritionDayUiState(
+    val date: String,
+    val isToday: Boolean,
+    val totals: DailyTotals = DailyTotals(),
+    /** Siempre los 4 tipos en orden, aunque estén vacíos: el dashboard muestra "Not logged yet". */
+    val groups: List<MealGroup> = MealType.entries.map { MealGroup(it, emptyList()) },
+    val goals: NutritionGoals,
+    val tip: String
+)
 
 /** Hoja abierta sobre 5.3 Add Food. */
 enum class AddFoodSheet { NONE, MANUAL, SEARCH }

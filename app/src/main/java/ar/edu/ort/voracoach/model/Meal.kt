@@ -21,6 +21,14 @@ data class Meal(
     val createdAt: Long = 0  // lo asigna el repositorio al guardar
 )
 
+/** Objetivos diarios del perfil; los porcentajes del dashboard se calculan contra estos valores. */
+data class NutritionGoals(
+    val calories: Double,
+    val protein: Double,
+    val carbs: Double,
+    val fat: Double
+)
+
 data class DailyTotals(
     val calories: Double = 0.0,
     val protein: Double = 0.0,

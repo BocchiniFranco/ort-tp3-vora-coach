@@ -5,21 +5,30 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ar.edu.ort.voracoach.data.repository.NutritionDataException
 import ar.edu.ort.voracoach.data.repository.NutritionRepository
+import ar.edu.ort.voracoach.model.DailyTotals
+import ar.edu.ort.voracoach.model.DemoData
 import ar.edu.ort.voracoach.model.Food
 import ar.edu.ort.voracoach.model.Meal
 import ar.edu.ort.voracoach.model.MealDates
 import ar.edu.ort.voracoach.model.MealType
+import ar.edu.ort.voracoach.model.NutritionGoals
 import ar.edu.ort.voracoach.navigation.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Locale
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 /**
  * Registro de comidas del flujo de Nutrición. Cada pantalla recibe su propia instancia;
@@ -47,6 +56,64 @@ class NutritionViewModel @Inject constructor(
     val addFoodState: StateFlow<AddFoodUiState> = _addFoodState.asStateFlow()
 
     private var searchJob: Job? = null
+
+    // ---------------------------------- Día (5.1 y 5.2) ----------------------------------
+
+    private val goals = DemoData.today.let {
+        NutritionGoals(it.caloriesGoal.toDouble(), it.proteinGoal, it.carbsGoal, it.fatGoal)
+    }
+
+    private val selectedDay = MutableStateFlow(initialDate)
+
+    /**
+     * Comidas y totales del día elegido, leídos de Room. Al cambiar de día, flatMapLatest
+     * deja de escuchar el día anterior. WhileSubscribed: solo consulta mientras una
+     * pantalla lo muestra (5 s de margen para que rotar no reinicie la consulta).
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val dayState: StateFlow<NutritionDayUiState> = selectedDay
+        .flatMapLatest { date ->
+            combine(repository.observeMeals(date), repository.observeDailyTotals(date)) { meals, totals ->
+                NutritionDayUiState(
+                    date = date,
+                    isToday = date == MealDates.today(),
+                    totals = totals,
+                    groups = MealType.entries.map { type -> MealGroup(type, meals.filter { it.mealType == type }) },
+                    goals = goals,
+                    tip = tipFor(totals, isToday = date == MealDates.today())
+                )
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = NutritionDayUiState(
+                date = initialDate,
+                isToday = initialDate == MealDates.today(),
+                goals = goals,
+                tip = tipFor(DailyTotals(), isToday = initialDate == MealDates.today())
+            )
+        )
+
+    fun selectDay(utcMillis: Long) {
+        selectedDay.value = MealDates.fromUtcMillis(utcMillis)
+    }
+
+    /** Recomendación simulada de VORA según cómo viene el día. */
+    private fun tipFor(totals: DailyTotals, isToday: Boolean): String = when {
+        !isToday && totals.mealCount == 0 ->
+            "No meals were logged on this day."
+        !isToday ->
+            "This day you logged ${totals.calories.roundToInt()} of your ${goals.calories.roundToInt()} kcal goal."
+        totals.mealCount == 0 ->
+            "Log your first meal and VORA will keep track of your daily targets."
+        totals.calories > goals.calories ->
+            "You're over your calorie goal today. Keep the rest of the day light."
+        totals.protein < goals.protein ->
+            "You're on track today. A protein-rich dinner would help you reach your target."
+        else ->
+            "Great job! You've hit your protein target for today."
+    }
 
     // ----------------------------------- Hojas de 5.3 -----------------------------------
 

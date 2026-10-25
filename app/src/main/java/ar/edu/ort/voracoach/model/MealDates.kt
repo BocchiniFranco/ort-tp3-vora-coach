@@ -40,6 +40,15 @@ object MealDates {
             .format(millis)
     }
 
+    /** Encabezado de 5.1 como en el Figma: "TUESDAY, 8 SEPTEMBER". */
+    fun headerLabel(date: String): String {
+        val millis = toUtcMillis(date) ?: return date
+        return SimpleDateFormat("EEEE, d MMMM", Locale.US)
+            .apply { timeZone = TimeZone.getTimeZone("UTC") }
+            .format(millis)
+            .uppercase(Locale.US)
+    }
+
     /** Tipo de comida que corresponde a la hora actual, para precargar el formulario. */
     fun suggestedMealType(): MealType = when (Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
         in 0..10 -> MealType.BREAKFAST

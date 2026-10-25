@@ -13,11 +13,29 @@ import ar.edu.ort.voracoach.navigation.Screen
 import ar.edu.ort.voracoach.navigation.placeholderDestination
 import ar.edu.ort.voracoach.ui.screens.nutrition.AddFoodScreen
 import ar.edu.ort.voracoach.ui.screens.nutrition.MealFormActions
+import ar.edu.ort.voracoach.ui.screens.nutrition.NutritionDashboardScreen
 import ar.edu.ort.voracoach.viewmodel.NutritionViewModel
 
 /** FLUJO 5 - NUTRICIÓN (Integrante 3). Las que siguen con placeholderDestination están pendientes. */
 fun NavGraphBuilder.nutritionGraph(navController: NavHostController) {
-    placeholderDestination(Screen.NutritionDashboard, navController)
+    composable(Screen.NutritionDashboard.route) {
+        val viewModel: NutritionViewModel = hiltViewModel()
+        val uiState by viewModel.dayState.collectAsStateWithLifecycle()
+
+        NutritionDashboardScreen(
+            uiState = uiState,
+            onDaySelected = viewModel::selectDay,
+            onTipClick = { navController.navigate(Screen.CoachConversation.route) },
+            onViewHistoryClick = { navController.navigate(Screen.NutritionProgress.route) },
+            onMealGroupClick = { navController.navigate(Screen.DailyMeals.createRoute(uiState.date)) },
+            onAddMealClick = { type ->
+                navController.navigate(Screen.AddFood.createRoute(date = uiState.date, mealType = type.name))
+            },
+            onVoiceClick = { navController.navigate(Screen.VoiceFoodLog.route) },
+            onPhotoClick = { navController.navigate(Screen.PhotoAnalysis.route) },
+            onSearchClick = { navController.navigate(Screen.AddFood.createRoute(date = uiState.date)) }
+        )
+    }
     // 5.2: {date} obligatorio con formato ISO yyyy-MM-dd.
     placeholderDestination(
         Screen.DailyMeals, navController,
