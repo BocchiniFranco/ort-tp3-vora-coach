@@ -4,9 +4,12 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import ar.edu.ort.voracoach.navigation.Screen
-import ar.edu.ort.voracoach.navigation.placeholderDestination
+import ar.edu.ort.voracoach.ui.screens.progress.HealthTrendsScreen
+import ar.edu.ort.voracoach.ui.screens.progress.NutritionProgressScreen
 import ar.edu.ort.voracoach.ui.screens.progress.ProgressDashboardScreen
 import ar.edu.ort.voracoach.ui.screens.progress.TodayOverviewScreen
+import ar.edu.ort.voracoach.ui.screens.progress.WeeklyReviewScreen
+import ar.edu.ort.voracoach.ui.screens.progress.WorkoutProgressScreen
 
 /**
  * FLUJO 6 - PROGRESO (Integrante 2). Pantallas de demostración con métricas simuladas.
@@ -41,9 +44,33 @@ fun NavGraphBuilder.progressGraph(navController: NavHostController) {
         )
     }
 
-    // Pendientes (tanda 2)
-    placeholderDestination(Screen.WorkoutProgress, navController)
-    placeholderDestination(Screen.NutritionProgress, navController)
-    placeholderDestination(Screen.HealthTrends, navController)
-    placeholderDestination(Screen.WeeklyReview, navController)
+    // 6.3 Workout Progress: cada ejercicio abre la guía de ejecución (4.6)
+    composable(Screen.WorkoutProgress.route) {
+        WorkoutProgressScreen(
+            onBackClick = { navController.popBackStack() },
+            onExerciseClick = { navController.navigate(Screen.ExerciseGuide.route) }
+        )
+    }
+
+    // 6.4 Nutrition Progress
+    composable(Screen.NutritionProgress.route) {
+        NutritionProgressScreen(onBackClick = { navController.popBackStack() })
+    }
+
+    // 6.5 Health Trends (también se abre desde el Home)
+    composable(Screen.HealthTrends.route) {
+        HealthTrendsScreen(onBackClick = { navController.popBackStack() })
+    }
+
+    // 6.6 Weekly Review
+    composable(Screen.WeeklyReview.route) {
+        WeeklyReviewScreen(
+            onBackClick = { navController.popBackStack() },
+            // "Get dinner ideas": abre el alta de comida con la cena ya elegida (5.3)
+            onImproveClick = { navController.navigate(Screen.AddFood.createRoute(mealType = "DINNER")) },
+            onNextWeekPlanClick = { navController.navigate(Screen.WeeklyPlan.route) },
+            onAskVoraClick = { navController.navigate(Screen.CoachReady.route) },
+            onDoneClick = { navController.popBackStack() }
+        )
+    }
 }
