@@ -276,11 +276,11 @@ codeburn
 npx codeburn
 ```
 
-| Integrante | Herramienta | Tokens / costo reportado por Codeburn |
-|---|---|---|
-| Integrante 1 | Claude Code | _(completar con la salida de Codeburn)_ |
-| Integrante 2 | _(completar)_ | _(completar)_ |
-| Integrante 3 | _(completar)_ | _(completar)_ |
+| Integrante   | Herramienta      | Tokens / costo reportado por Codeburn                                                                                                                                                                                                        |
+|--------------|------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Integrante 1 | Claude Code      | _(completar con la salida de Codeburn)_                                                                                                                                                                                                      |
+| Mateo Gago   | Claude app(nube) | Codeburn local: $0.00 / 0 sesiones en los últimos 30 días (período del TP). La asistencia se hizo desde la app de Claude en la nube, que no deja registros locales que Codeburn pueda leer [Captura](docs/capturas/codeburn_integrante2.png) |
+| Integrante 3 | _(completar)_    | _(completar)_                                                                                                                                                                                                                                |
 
 ## 10. Comparaciones visuales Figma vs. app (UI01)
 
