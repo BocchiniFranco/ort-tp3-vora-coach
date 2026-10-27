@@ -15,7 +15,7 @@ Kotlin · Jetpack Compose · Material 3 · Clean Architecture + MVVM · Hilt/Dag
 |---|-----------------|---|
 | 1 | Franco Bocchini | Base del proyecto (Gradle, Hilt, tema, componentes reutilizables), navegación (37 rutas) y flujos 1, 2 y 3 |
 | 2 | Mateo Gago      | Entrenamiento funcional con Retrofit + caché Room (flujo 4) y Progreso (flujo 6) |
-| 3 | _(completar)_   | Nutrición funcional con Room (flujo 5), Perfil (flujo 7) y documentación |
+| 3 | Hugo Guarneri   | Nutrición funcional con Room (flujo 5), Perfil (flujo 7) y documentación |
 
 ## 2. Diseño de referencia (Figma)
 
@@ -45,50 +45,56 @@ botones, chips, filas de lista, gráficos y vistas de estado (Loading / Empty / 
 **Funcional** = consume datos reales (Retrofit y/o Room). **Demostración** = navegable con datos locales de ejemplo.
 La columna *Avance* se actualiza en cada entrega (⏳ placeholder navegable · ✅ pantalla final).
 
-| Nº | Pantalla (Figma) | Ruta | Tipo | Resp. | Avance |
-|---|---|---|---|---|--|
-| 1.1 | Login | `access/login` | Demostración | I1 | ✅ |
-| 1.2 | Register | `access/register` | Demostración | I1 | ✅ |
-| 2.1 | Home Dashboard | `home/dashboard` | Demostración | I1 | ✅ |
-| 2.2 | Notifications | `home/notifications` | Demostración | I1 | ✅ |
-| 3.1 | Coach Ready | `coach/ready` | Demostración | I1 | ✅ |
-| 3.2 | Coach Listening | `coach/listening` | Demostración | I1 | ✅ |
-| 3.3 | Coach Processing | `coach/processing` | Demostración | I1 | ✅ |
-| 3.4 | Coach Voice Response | `coach/voice-response` | Demostración | I1 | ✅ |
-| 3.5 | Coach Conversation | `coach/conversation` | Demostración | I1 | ✅ |
-| 3.6 | Coach Mic Error | `coach/mic-error` | Demostración | I1 | ✅ |
-| 4.1 | Workout Dashboard | `workout/dashboard` | **Funcional** (GET `/v1/workouts` + Room) | I2 | ✅ |
-| 4.2 | Weekly Plan | `workout/weekly-plan` | Demostración | I2 | ✅ |
-| 4.3 | Workout Detail | `workout/detail/{workoutId}` | **Funcional** (GET `/v1/workouts/{workoutId}` + Room) | I2 | ✅ |
-| 4.4 | Workout Prep | `workout/prep` | Demostración | I2 | ✅ |
-| 4.5 | Active Workout | `workout/active` | Demostración | I2 | ✅ |
-| 4.6 | Exercise Guide | `workout/exercise-guide` | Demostración | I2 | ✅ |
-| 4.7 | Workout Completed | `workout/completed` | Demostración | I2 | ✅ |
-| 5.1 | Nutrition Dashboard | `nutrition/dashboard` | **Funcional** (totales diarios Room) | I3 | ⏳ |
-| 5.2 | Daily Meals | `nutrition/meals/{date}` | **Funcional** (listado por fecha + baja Room) | I3 | ⏳ |
-| 5.3 | Add Food | `nutrition/add?date={date}&mealType={mealType}` | **Funcional** (alta manual Room) | I3 | ⏳ |
-| 5.4 | Voice Food Log | `nutrition/voice-log` | Demostración (sin micrófono) | I3 | ⏳ |
-| 5.5 | Food Analysis | `nutrition/food-analysis` | Demostración | I3 | ⏳ |
-| 5.6 | Photo Analysis | `nutrition/photo-analysis` | Demostración (sin cámara) | I3 | ⏳ |
-| 5.7 | Meal Review & Confirm | `nutrition/review` | Demostración | I3 | ⏳ |
-| 5.8 | Meal Detail | `nutrition/meal/{mealId}` | **Funcional** (lectura + baja Room) | I3 | ⏳ |
-| 6.1 | Daily Summary | `progress/daily-summary` | Demostración | I2 | ✅ |
-| 6.2 | Progress Dashboard | `progress/dashboard` | Demostración | I2 | ✅ |
-| 6.3 | Workout Progress | `progress/workouts` | Demostración | I2 | ✅ |
-| 6.4 | Nutrition Progress | `progress/nutrition` | Demostración | I2 | ✅ |
-| 6.5 | Health Trends | `progress/health-trends` | Demostración | I2 | ✅ |
-| 6.6 | Weekly Review | `progress/weekly-review` | Demostración | I2 | ✅ |
-| 7.1 | Profile Dashboard | `profile/dashboard` | Demostración (Alex Morgan) | I3 | ⏳ |
-| 7.2 | Edit Profile | `profile/edit` | Demostración | I3 | ⏳ |
-| 7.3 | Goals & Preferences | `profile/goals` | Demostración | I3 | ⏳ |
-| 7.4 | Nutrition Preferences | `profile/nutrition-preferences` | Demostración | I3 | ⏳ |
-| 7.5 | Voice & AI Settings | `profile/voice-ai` | Demostración | I3 | ⏳ |
-| 7.6 | App Settings | `profile/app-settings` | Demostración (logout → Login) | I3 | ⏳ |
+| Nº | Pantalla (frame del Figma) | Ruta | Tipo | Resp. | Avance |
+|---|---|---|---|---|---|
+| 1.1 | Login - 01 — SignIn | `access/login` | Demostración | I1 | ✅ |
+| 1.2 | Login - 02 — SignUp | `access/register` | Demostración | I1 | ✅ |
+| 2.1 | Home / 01 — Dashboard | `home/dashboard` | Demostración | I1 | ✅ |
+| 2.2 | Home / 02 — Notifications | `home/notifications` | Demostración | I1 | ✅ |
+| 3.1 | Voice / 01 — Idle | `coach/ready` | Demostración | I1 | ✅ |
+| 3.2 | Voice / 02 — Listening | `coach/listening` | Demostración | I1 | ✅ |
+| 3.3 | Voice / 03 — Processing | `coach/processing` | Demostración | I1 | ✅ |
+| 3.4 | Voice / 04 — Speaking | `coach/voice-response` | Demostración | I1 | ✅ |
+| 3.5 | Voice / 05 — Conversation | `coach/conversation` | Demostración | I1 | ✅ |
+| 3.6 | Voice / 06 — Error | `coach/mic-error` | Demostración | I1 | ✅ |
+| 4.1 | Workout / 01 — Dashboard | `workout/dashboard` | **Funcional** (GET `/v1/workouts` + Room) | I2 | ✅ |
+| 4.2 | Workout / 02 — Weekly Plan | `workout/weekly-plan` | Demostración | I2 | ✅ |
+| 4.3 | Workout / 03 — Workout Details | `workout/detail/{workoutId}` | **Funcional** (GET `/v1/workouts/{workoutId}` + Room) | I2 | ✅ |
+| 4.4 | Workout / 04 — Pre Workout | `workout/prep` | Demostración | I2 | ✅ |
+| 4.5 | Workout / 05 — Active Workout | `workout/active` | Demostración | I2 | ✅ |
+| 4.6 | Workout / 06 — Exercise Details | `workout/exercise-guide` | Demostración | I2 | ✅ |
+| 4.7 | Workout / 07 — Workout Complete | `workout/completed` | Demostración | I2 | ✅ |
+| 5.1 | Nutrition / 01 — Dashboard | `nutrition/dashboard` | **Funcional** (comidas y totales del día en Room) | I3 | ✅ |
+| 5.2 | Nutrition / 02 — Today's Meals | `nutrition/meals/{date}` | **Funcional** (listado por fecha en Room) | I3 | ✅ |
+| 5.3 | Nutrition / 03 — Add Food | `nutrition/add?date={date}&mealType={mealType}` | **Funcional** (alta manual en Room; búsqueda opcional con GET `/v1/foods`) | I3 | ✅ |
+| 5.4 | Nutrition / 04 — Voice Food Logging | `nutrition/voice-log` | Demostración (sin micrófono) | I3 | ✅ |
+| 5.5 | Nutrition / 05 — Food Analysis | `nutrition/food-analysis` | Demostración (análisis simulado con POST `/v1/nutrition/analyses`) | I3 | ✅ |
+| 5.6 | Nutrition / 06 — Photo Analysis | `nutrition/photo-analysis` | Demostración (sin cámara) | I3 | ✅ |
+| 5.7 | Nutrition / 07 — Food Confirmation | `nutrition/review` | Demostración (al confirmar guarda en Room) | I3 | ✅ |
+| 5.8 | Nutrition / 08 — Meal Details | `nutrition/meal/{mealId}` | **Funcional** (lectura y baja con confirmación en Room) | I3 | ✅ |
+| 6.1 | Progress / 01 — Today's Overview | `progress/daily-summary` | Demostración | I2 | ✅ |
+| 6.2 | Progress / 02 — Dashboard | `progress/dashboard` | Demostración | I2 | ✅ |
+| 6.3 | Progress / 03 — Workout Progress | `progress/workouts` | Demostración | I2 | ✅ |
+| 6.4 | Progress / 04 — Nutrition Progress | `progress/nutrition` | Demostración | I2 | ✅ |
+| 6.5 | Progress / 05 — Health Trends | `progress/health-trends` | Demostración | I2 | ✅ |
+| 6.6 | Progress / 06 — Weekly Review | `progress/weekly-review` | Demostración | I2 | ✅ |
+| 7.1 | Profile / 01 — Dashboard | `profile/dashboard` | Demostración (Alex Morgan) | I3 | ✅ |
+| 7.2 | Profile / 02 — Edit Profile | `profile/edit` | Demostración | I3 | ✅ |
+| 7.3 | Profile / 03 — Goals & Preferences | `profile/goals` | Demostración | I3 | ✅ |
+| 7.4 | Profile / 04 — Nutrition Preferences | `profile/nutrition-preferences` | Demostración | I3 | ✅ |
+| 7.5 | Profile / 05 — Voice & AI Settings | `profile/voice-ai` | Demostración | I3 | ✅ |
+| 7.6 | Profile / 06 — Settings | `profile/app-settings` | Demostración (Log out con confirmación → Login) | I3 | ✅ |
 
-> ⚠️ Antes de la entrega final hay que contrastar los títulos de esta tabla con los nombres exactos de los 37 frames del Figma.
+Los nombres de la segunda columna son los de los 37 frames del Figma, en el mismo orden.
+
+**Sin frame en el Figma:** la carga manual y la búsqueda de alimentos se abren como hojas sobre 5.3 ("Log Manually" y
+"Search Database"), y la baja de una comida es el "Remove" de cada ingrediente en 5.8, con el mismo estilo que el de 5.7.
+El perfil y sus preferencias se guardan en memoria mientras la app está abierta (`ProfileRepository`); las opciones de
+Settings sin pantalla en el Figma avisan que no están disponibles en la demostración.
 
 Las rutas están tipadas en `navigation/Screen.kt` (sealed class) y registradas en `navigation/VoraNavHost.kt`.
-La barra inferior (`Home`, `Workout`, `Nutrition`, `Progress`, `Profile`) solo aparece en los 5 destinos raíz.
+La barra inferior (`Home`, `Workout`, `Nutrition`, `Progress`, `Profile`) aparece en los 5 destinos raíz y en las
+pantallas que la muestran en el Figma (Notifications y las de Nutrición que la tienen).
 El botón físico **Atrás** lo resuelve el `NavController` en todas las pantallas.
 
 ## 4. Arquitectura
@@ -152,7 +158,7 @@ python test_server.py             # pruebas del propio mock (deben dar OK)
 
 Con el mock corriendo, `http://localhost:8000/docs` muestra el contrato en Swagger UI.
 
-### 5.3 Contrato usado por la app (Flujo 4)
+### 5.3 Contrato usado por la app
 
 | Endpoint | Respuesta OK | Campos |
 |---|---|---|
@@ -162,9 +168,16 @@ Con el mock corriendo, `http://localhost:8000/docs` muestra el contrato en Swagg
 Errores: siempre `{"error": {"code": "...", "message": "..."}}`. Por ejemplo `503 SERVICE_UNAVAILABLE` o
 `404 WORKOUT_NOT_FOUND` cuando el id no existe. Se mapean con `ErrorResponseDto`.
 
-Los demás endpoints del contrato (`/v1/plans/weekly`, `/v1/foods`, `/v1/coach/*`, `/v1/nutrition/analyses`,
-`/v1/progress/weekly-review`, `/v1/activity/daily`) son **opcionales** y no se usan: la consigna pide Retrofit solo
-en Entrenamiento, y el resto de los módulos funcionan con datos de demostración o con Room.
+Nutrición usa además dos endpoints **opcionales** (`NutritionApiService`), como ampliación de búsqueda y cálculo
+nutricional. Las comidas nunca se mandan al servidor: se guardan solo en Room.
+
+| Endpoint | Respuesta OK | Uso en la app |
+|---|---|---|
+| `GET /v1/foods?q=&page=&pageSize=` | `{"data": [ ... ], "meta": {page, pageSize, total}}` | "Search Database" de 5.3: elegir un alimento precarga el formulario con sus valores cada 100 g |
+| `POST /v1/nutrition/analyses` (`source` `text` o `photo`, `preset`) | `{"data": { items[], totals, isSimulated, requiresConfirmation }}` | Análisis simulado de 5.4 a 5.7: se revisa en 5.7 y recién al confirmar se guarda en Room |
+
+Los demás endpoints del contrato (`/v1/plans/weekly`, `/v1/coach/*`, `/v1/progress/weekly-review`,
+`/v1/activity/daily`) son opcionales y no se usan: esos módulos funcionan con datos de demostración.
 
 ### 5.4 Escenarios de prueba (RF05)
 
@@ -288,9 +301,9 @@ npx codeburn
 |---|--|--|--|
 | 1 | 4.1 Workout Dashboard (funcional: Retrofit + Room) | <img src="docs/capturas/figma_4_1.jpg" width="220"> | <img src="docs/capturas/app_4_1.png" width="220"> <img src="docs/capturas/app_4_1_catalogo.png" width="220"> |
 | 2 | 6.2 Progress Dashboard | <img src="docs/capturas/figma_6_2.jpg" width="220"> | <img src="docs/capturas/app_6_2.png" width="220"> |
-| 3 | _(completar)_ | _(captura)_ | _(captura)_ |
-| 4 | _(completar)_ | _(captura)_ | _(captura)_ |
-| 5 | _(completar)_ | _(captura)_ | _(captura)_ |
+| 3 | 5.1 Nutrition Dashboard (funcional: comidas y totales del día en Room) | <img src="docs/capturas/figma_5_1.png" width="220"> | <img src="docs/capturas/app_5_1.png" width="220"> |
+| 4 | 5.8 Meal Details (funcional: lectura y baja con confirmación en Room) | <img src="docs/capturas/figma_5_8.png" width="220"> | <img src="docs/capturas/app_5_8.png" width="220"> |
+| 5 | 7.1 Profile Dashboard | <img src="docs/capturas/figma_7_1.png" width="220"> | <img src="docs/capturas/app_7_1.png" width="220"> |
 
 ## 11. Video de demostración
 
