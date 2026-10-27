@@ -12,8 +12,9 @@ sealed interface WorkoutsUiState {
     /** Esperando la respuesta del servidor. */
     data object Loading : WorkoutsUiState
 
-    /** Llegaron entrenamientos para mostrar. */
-    data class Success(val workouts: List<Workout>) : WorkoutsUiState
+    /** Llegaron entrenamientos. isOffline = true si vienen de la caché de Room (RF02). */
+    data class Success(val workouts: List<Workout>, val isOffline: Boolean = false) :
+        WorkoutsUiState
 
     /** El servidor respondió bien pero sin entrenamientos (escenario "empty"). */
     data object Empty : WorkoutsUiState

@@ -44,7 +44,12 @@ class WorkoutDetailViewModel @Inject constructor(
         _uiState.value = WorkoutDetailUiState.Loading
         viewModelScope.launch {
             _uiState.value = repository.fetchWorkoutDetail(workoutId).fold(
-                onSuccess = { workout -> WorkoutDetailUiState.Success(workout) },
+                onSuccess = { result ->
+                    WorkoutDetailUiState.Success(
+                        result.data,
+                        isOffline = result.isFromCache
+                    )
+                },
                 onFailure = { error ->
                     WorkoutDetailUiState.Error(
                         if (error is WorkoutDataException) error.message.orEmpty()

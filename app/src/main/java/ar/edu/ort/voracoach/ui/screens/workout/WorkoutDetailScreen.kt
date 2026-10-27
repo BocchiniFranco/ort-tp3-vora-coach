@@ -40,6 +40,7 @@ import ar.edu.ort.voracoach.ui.theme.VoraLightMint
 import ar.edu.ort.voracoach.ui.theme.VoraTextPrimary
 import ar.edu.ort.voracoach.ui.theme.VoraTextSecondary
 import ar.edu.ort.voracoach.viewmodel.WorkoutDetailUiState
+import ar.edu.ort.voracoach.ui.components.VoraOfflineBanner
 
 /**
  * 4.3 WorkoutDetailScreen (FUNCIONAL: GET /v1/workouts/{workoutId}, RF01 y RF05).
@@ -81,6 +82,17 @@ fun WorkoutDetailScreen(
 
             is WorkoutDetailUiState.Success -> {
                 val workout = uiState.workout
+
+                // Aviso si el detalle viene de la caché de Room (RF02)
+                if (uiState.isOffline) {
+                    item {
+                        VoraOfflineBanner(
+                            message = "You're offline. Showing the saved version of this workout.",
+                            onRetry = onRetryClick,
+                            modifier = Modifier.padding(horizontal = VoraScreenPadding)
+                        )
+                    }
+                }
 
                 // Nombre, resumen y músculos trabajados
                 item { WorkoutHeader(workout, Modifier.padding(horizontal = VoraScreenPadding)) }

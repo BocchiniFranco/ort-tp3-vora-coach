@@ -59,6 +59,7 @@ import ar.edu.ort.voracoach.ui.theme.VoraTextPrimary
 import ar.edu.ort.voracoach.ui.theme.VoraTextSecondary
 import ar.edu.ort.voracoach.ui.theme.VoraTrack
 import ar.edu.ort.voracoach.viewmodel.WorkoutsUiState
+import ar.edu.ort.voracoach.ui.components.VoraOfflineBanner
 
 /**
  * 4.1 WorkoutDashboardScreen (FUNCIONAL: GET /v1/workouts, RF01 y RF05).
@@ -168,15 +169,26 @@ fun WorkoutDashboardScreen(
                 )
             }
 
-            is WorkoutsUiState.Success -> items(uiState.workouts, key = { it.id }) { workout ->
-                WorkoutCatalogCard(
-                    workout = workout,
-                    onClick = { onWorkoutClick(workout.id) },
-                    modifier = Modifier.padding(horizontal = VoraScreenPadding)
-                )
+            is WorkoutsUiState.Success -> {
+                // Si los datos vienen de Room porque falló la red, se avisa con reintento (RF02, RF05)
+                if (uiState.isOffline) {
+                    item {
+                        VoraOfflineBanner(
+                            message = "You're offline. Showing your saved workouts.",
+                            onRetry = onRetryClick,
+                            modifier = Modifier.padding(horizontal = VoraScreenPadding)
+                        )
+                    }
+                }
+                items(uiState.workouts, key = { it.id }) { workout ->
+                    WorkoutCatalogCard(
+                        workout = workout,
+                        onClick = { onWorkoutClick(workout.id) },
+                        modifier = Modifier.padding(horizontal = VoraScreenPadding)
+                    )
+                }
             }
         }
-
         // Panel de pruebas del mock (para mostrar RF05 en la defensa)
         item {
             MockScenarioPanel(

@@ -1,34 +1,63 @@
 package ar.edu.ort.voracoach.data.repository
 
+import ar.edu.ort.voracoach.data.local.dao.MealDao
+import ar.edu.ort.voracoach.data.local.entity.toDomain
+import ar.edu.ort.voracoach.data.local.entity.toEntity
 import ar.edu.ort.voracoach.data.remote.NutritionApiService
 import ar.edu.ort.voracoach.data.remote.dto.NutritionAnalysisRequestDto
 import ar.edu.ort.voracoach.data.remote.dto.toDomain
 import ar.edu.ort.voracoach.model.AnalysisPreset
 import ar.edu.ort.voracoach.model.AnalysisSource
+import ar.edu.ort.voracoach.model.DailyTotals
 import ar.edu.ort.voracoach.model.FoodPage
+import ar.edu.ort.voracoach.model.Meal
 import ar.edu.ort.voracoach.model.NutritionAnalysis
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Repositorio del flujo 5 (Nutrición): ÚNICA puerta de entrada a los datos de comidas.
- * El ViewModel le pide datos y no sabe si vienen de la API o de Room (RF06).
+ * Las comidas las carga el usuario y viven solo en Room: nunca se mandan al servidor.
+ * La API se usa únicamente para buscar alimentos y para el análisis simulado.
  *
- * Por ahora usa solo los endpoints opcionales de la API (búsqueda y análisis simulado).
- * Cuando exista VoraDatabase se agrega acá el MealDao para el registro de comidas
- * (RF03, RF04), sin cambiar a quien ya lo use.
- *
- * Devuelve Result<T>: Result.success(datos) o Result.failure(error). Así un fallo de red,
- * un error HTTP o un JSON roto NUNCA cierran la app: el ViewModel decide qué mostrar.
- *
- * @Singleton + @Inject constructor: Hilt crea una sola instancia y le pasa la API.
+ * Las acciones devuelven Result para que un fallo de red, un error HTTP o un JSON roto
+ * no cierren la app: el ViewModel decide qué mostrar.
  */
 @Singleton
 class NutritionRepository @Inject constructor(
-    private val api: NutritionApiService
+    private val api: NutritionApiService,
+    private val mealDao: MealDao
 ) {
 
-    /** Búsqueda de alimentos: GET /v1/foods convertido a modelos. */
+    // ------------------------------ Registro de comidas (Room) ------------------------------
+
+    /** date en formato yyyy-MM-dd. */
+    fun observeMeals(date: String): Flow<List<Meal>> =
+        mealDao.observeMealsByDate(date).map { meals -> meals.map { it.toDomain() } }
+
+    /** Emite null si la comida no existe o se eliminó. */
+    fun observeMeal(id: Long): Flow<Meal?> =
+        mealDao.observeMealById(id).map { it?.toDomain() }
+
+    fun observeDailyTotals(date: String): Flow<DailyTotals> =
+        mealDao.observeDailyTotals(date).map { it.toDomain() }
+
+    /** No valida los campos: eso lo hace el ViewModel antes de llamar. Devuelve el id nuevo. */
+    suspend fun addMeal(meal: Meal): Result<Long> = runCatching {
+        mealDao.insert(
+            meal.copy(id = 0, name = meal.name.trim(), createdAt = System.currentTimeMillis())
+                .toEntity()
+        )
+    }
+
+    suspend fun deleteMeal(id: Long): Result<Unit> = runCatching {
+        mealDao.deleteById(id)
+        Unit
+    }
+
+    // ------------------------- Búsqueda y análisis (API opcional) -------------------------
+
     suspend fun searchFoods(
         query: String,
         page: Int = 1,
@@ -36,7 +65,6 @@ class NutritionRepository @Inject constructor(
     ): Result<FoodPage> = runCatching {
         // Una búsqueda en blanco trae todos los alimentos: no se manda el parámetro q
         val response = api.searchFoods(query.trim().ifBlank { null }, page, pageSize)
-        // isSuccessful = código HTTP entre 200 y 299. Si no (ej. 503), es un error.
         if (!response.isSuccessful) {
             throw NutritionDataException(errorMessageFor(response.code()))
         }
@@ -44,10 +72,7 @@ class NutritionRepository @Inject constructor(
             ?: throw NutritionDataException("The food list came back empty.")
     }
 
-    /**
-     * Análisis simulado: POST /v1/nutrition/analyses convertido a modelo.
-     * Con source = TEXT hace falta [text]; con PHOTO el servidor usa una foto de ejemplo.
-     */
+    /** Con source TEXT hace falta [text]; con PHOTO el servidor usa una foto de ejemplo. */
     suspend fun analyzeMeal(
         source: AnalysisSource,
         text: String? = null,
@@ -66,7 +91,7 @@ class NutritionRepository @Inject constructor(
             ?: throw NutritionDataException("This meal analysis is incomplete.")
     }
 
-    /** Mensaje para el usuario según el código HTTP (textos en inglés, como la UI). */
+    /** Textos en inglés, como el resto de la UI. */
     private fun errorMessageFor(httpCode: Int): String = when (httpCode) {
         HTTP_BAD_REQUEST -> "Please check what you entered and try again."
         HTTP_SERVICE_UNAVAILABLE -> "The server is unavailable. Please try again."
@@ -80,5 +105,5 @@ class NutritionRepository @Inject constructor(
     }
 }
 
-/** Error "nuestro" con un mensaje pensado para mostrarle al usuario. */
+/** Error con un mensaje listo para mostrarle al usuario. */
 class NutritionDataException(message: String) : Exception(message)

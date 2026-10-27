@@ -29,16 +29,17 @@ fun NavGraphBuilder.homeGraph(navController: NavHostController) {
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         HomeDashboardScreen(
             uiState = uiState,
-            onNotificationsClick = { navController.navigate(Screen.Notifications.route) },
             onProfileClick = { navController.navigateToBottomDestination(VoraBottomDestination.PROFILE) },
-            onTalkToVoraClick = { navController.navigate(Screen.CoachReady.route) },
-            onChatWithVoraClick = { navController.navigate(Screen.CoachConversation.route) },
+            onNotificationsClick = { navController.navigate(Screen.Notifications.route) },
+            onStartVoiceSessionClick = { navController.navigate(Screen.CoachReady.route) },
+            onStartMyWorkoutClick = { navController.navigateToBottomDestination(VoraBottomDestination.WORKOUT) },
+            onLogBreakfastClick = { navController.navigate(Screen.AddFood.createRoute(mealType = "BREAKFAST")) },
+            onTipClick = { navController.navigate(Screen.CoachConversation.route) },
             onDailyGoalClick = { navController.navigate(Screen.DailySummary.route) },
-            onWorkoutClick = { navController.navigateToBottomDestination(VoraBottomDestination.WORKOUT) },
-            onWeeklyPlanClick = { navController.navigate(Screen.WeeklyPlan.route) },
             onNutritionClick = { navController.navigateToBottomDestination(VoraBottomDestination.NUTRITION) },
-            onLogMealClick = { navController.navigate(Screen.AddFood.createRoute()) },
-            onWeeklyReviewClick = { navController.navigate(Screen.WeeklyReview.route) }
+            onActivityClick = { navController.navigate(Screen.HealthTrends.route) },
+            onRecommendedWorkoutClick = { navController.navigateToBottomDestination(VoraBottomDestination.WORKOUT) },
+            onStartWorkoutClick = { navController.navigate(Screen.WorkoutPrep.route) }
         )
     }
 
@@ -48,7 +49,6 @@ fun NavGraphBuilder.homeGraph(navController: NavHostController) {
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         NotificationsScreen(
             uiState = uiState,
-            onBackClick = { navController.popBackStack() },
             onMarkAllReadClick = viewModel::markAllAsRead,
             onNotificationClick = { notification ->
                 viewModel.onNotificationOpened(notification.id)
@@ -61,10 +61,14 @@ fun NavGraphBuilder.homeGraph(navController: NavHostController) {
 /** Destino de cada tipo de notificación. Las pestañas raíz usan la navegación de BottomBar. */
 private fun NavHostController.openNotification(notification: NotificationItem) {
     when (notification.type) {
-        NotificationType.WORKOUT -> navigateToBottomDestination(VoraBottomDestination.WORKOUT)
-        NotificationType.NUTRITION -> navigate(Screen.AddFood.createRoute())
-        NotificationType.COACH -> navigate(Screen.CoachConversation.route)
-        NotificationType.GOAL -> navigate(Screen.DailySummary.route)
-        NotificationType.PROGRESS -> navigate(Screen.WeeklyReview.route)
+        // "Your weekly health review is ready." → 6.6 Weekly Review
+        NotificationType.COACH -> navigate(Screen.WeeklyReview.route)
+        // "Upper Body Strength is ready." → 4.4 Workout Prep
+        NotificationType.WORKOUT -> navigate(Screen.WorkoutPrep.route)
+        // "Protein target milestone alert." → pestaña Nutrition
+        NotificationType.NUTRITION -> navigateToBottomDestination(VoraBottomDestination.NUTRITION)
+        // "4-day workout streak logged!" → 6.3 Workout Progress
+        NotificationType.GOAL -> navigate(Screen.WorkoutProgress.route)
+        NotificationType.PROGRESS -> navigate(Screen.ProgressDashboard.route)
     }
 }

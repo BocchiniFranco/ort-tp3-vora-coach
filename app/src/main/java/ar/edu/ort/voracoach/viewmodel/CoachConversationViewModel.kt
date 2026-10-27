@@ -12,15 +12,19 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+// LocalTime + DateTimeFormatter: hora actual "HH:mm" para los mensajes nuevos.
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 /**
  * Estado del chat con VORA (3.5 Coach Conversation).
+ * @property dateLabel encabezado del hilo ("TODAY AT 12:40 PM").
  * @property isVoraTyping true mientras se "genera" la respuesta (muestra "Vora is typing...").
  */
 data class CoachConversationUiState(
     val messages: List<ChatMessage> = DemoData.initialConversation,
-    val suggestions: List<String> = DemoData.coachSuggestions,
+    val dateLabel: String = DemoData.CONVERSATION_DATE_LABEL,
     val isVoraTyping: Boolean = false
 )
 
@@ -47,20 +51,24 @@ class CoachConversationViewModel @Inject constructor() : ViewModel() {
         val clean = text.trim()
         if (clean.isEmpty() || _uiState.value.isVoraTyping) return
         _uiState.update {
-            it.copy(messages = it.messages + ChatMessage(nextId++, ChatAuthor.USER, clean), isVoraTyping = true)
+            it.copy(messages = it.messages + ChatMessage(nextId++, ChatAuthor.USER, clean, now()), isVoraTyping = true)
         }
         viewModelScope.launch {
             delay(TYPING_DELAY_MS)
             _uiState.update {
                 it.copy(
-                    messages = it.messages + ChatMessage(nextId++, ChatAuthor.VORA, DemoData.cannedReplyFor(clean)),
+                    messages = it.messages + ChatMessage(nextId++, ChatAuthor.VORA, DemoData.cannedReplyFor(clean), now()),
                     isVoraTyping = false
                 )
             }
         }
     }
 
+    /** Hora actual con el formato de las burbujas del Figma ("12:41"). */
+    private fun now(): String = LocalTime.now().format(TIME_FORMAT)
+
     private companion object {
         const val TYPING_DELAY_MS = 1_200L
+        val TIME_FORMAT: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
     }
 }

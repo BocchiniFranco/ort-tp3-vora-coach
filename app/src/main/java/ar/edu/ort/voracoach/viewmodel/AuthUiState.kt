@@ -24,7 +24,6 @@ sealed interface AuthUiState {
     data class Error(
         val nameError: String? = null,
         val emailError: String? = null,
-        val passwordError: String? = null,
-        val confirmPasswordError: String? = null
+        val passwordError: String? = null
     ) : AuthUiState
 }

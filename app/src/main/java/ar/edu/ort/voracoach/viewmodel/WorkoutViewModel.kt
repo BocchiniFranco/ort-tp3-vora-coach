@@ -66,9 +66,9 @@ class WorkoutViewModel @Inject constructor(
         // viewModelScope.launch: corrutina que se cancela sola si el ViewModel se destruye
         viewModelScope.launch {
             _uiState.value = repository.fetchWorkouts().fold(
-                onSuccess = { workouts ->
-                    if (workouts.isEmpty()) WorkoutsUiState.Empty
-                    else WorkoutsUiState.Success(workouts)
+                onSuccess = { result ->
+                    if (result.data.isEmpty()) WorkoutsUiState.Empty
+                    else WorkoutsUiState.Success(result.data, isOffline = result.isFromCache)
                 },
                 onFailure = { error -> WorkoutsUiState.Error(error.toUserMessage()) }
             )

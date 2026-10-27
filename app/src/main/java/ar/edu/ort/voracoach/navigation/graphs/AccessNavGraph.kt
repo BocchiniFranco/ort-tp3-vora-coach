@@ -2,6 +2,8 @@
 // así se evitan conflictos de merge en main y git blame refleja la autoría.
 package ar.edu.ort.voracoach.navigation.graphs
 
+// LocalActivity: da acceso a la Activity actual (para cerrar la app desde el Login).
+import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 // collectAsStateWithLifecycle: convierte el StateFlow del ViewModel en State de Compose
@@ -28,6 +30,7 @@ fun NavGraphBuilder.accessGraph(navController: NavHostController, authViewModel:
     // 1.1 Login
     composable(Screen.Login.route) {
         val uiState by authViewModel.uiState.collectAsStateWithLifecycle()
+        val activity = LocalActivity.current
         // Efecto de navegación: cuando el estado pasa a Authenticated se va al Home una sola vez.
         LaunchedEffect(uiState) {
             if (uiState is AuthUiState.Authenticated) {
@@ -37,8 +40,10 @@ fun NavGraphBuilder.accessGraph(navController: NavHostController, authViewModel:
         }
         LoginScreen(
             uiState = uiState,
+            // Login es la primera pantalla: "<" hace lo mismo que el botón Atrás del sistema (salir).
+            onBackClick = { activity?.finish() },
             onLoginClick = authViewModel::signIn,
-            onDemoLoginClick = authViewModel::signInAsDemoUser,
+            onSocialLoginClick = authViewModel::signInAsDemoUser,
             onRegisterClick = {
                 authViewModel.clearErrors()
                 navController.navigate(Screen.Register.route)
@@ -58,6 +63,7 @@ fun NavGraphBuilder.accessGraph(navController: NavHostController, authViewModel:
         RegisterScreen(
             uiState = uiState,
             onCreateAccountClick = authViewModel::register,
+            onSocialSignUpClick = authViewModel::signInAsDemoUser,
             onBackToLoginClick = {
                 authViewModel.clearErrors()
                 navController.popBackStack()

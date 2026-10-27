@@ -21,25 +21,27 @@ import androidx.compose.ui.graphics.Color
 // StrokeCap.Round: extremos redondeados del arco, como en Figma.
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import ar.edu.ort.voracoach.ui.theme.VoraMintProgress
+import androidx.compose.ui.unit.sp
+import ar.edu.ort.voracoach.ui.theme.VoraBorder
+import ar.edu.ort.voracoach.ui.theme.VoraGreen
 import ar.edu.ort.voracoach.ui.theme.VoraTextPrimary
 import ar.edu.ort.voracoach.ui.theme.VoraTextSecondary
-import ar.edu.ort.voracoach.ui.theme.VoraTrack
 
 /**
- * VoraCircularProgress: anillo de progreso circular para porcentajes
- * ("72% Daily Goal", "67% Calories Consumed").
+ * VoraCircularProgress: anillo de avance global ("72% Daily Goal", "67% Calories Consumed").
  *
- * Se dibuja con Canvas en lugar de CircularProgressIndicator para controlar exactamente
- * grosor, colores, extremos redondeados y el texto central (fidelidad UI01).
+ * Valores del Figma (lámina "Indicadores" y Home): anillo de 64–72 dp, grosor ≈ 7,5 % del
+ * diámetro, avance verde #123D35 sobre pista #E4E9E6 y porcentaje 16 Bold en el centro.
+ * Se dibuja con Canvas para controlar exactamente grosor, colores y extremos redondeados.
  *
  * @param progress valor entre 0f y 1f (se recorta si se excede).
- * @param centerText texto grande del centro (ej. "72%").
- * @param label texto pequeño debajo (ej. "Daily Goal").
- * @param valueColor color del texto central (blanco si el anillo va sobre una Hero Card).
+ * @param centerText texto del centro (ej. "72%").
+ * @param label texto opcional debajo del porcentaje (dentro del anillo).
+ * @param strokeWidth grosor; si es null se calcula como 7,5 % del tamaño.
  */
 @Composable
 fun VoraCircularProgress(
@@ -47,10 +49,10 @@ fun VoraCircularProgress(
     centerText: String,
     modifier: Modifier = Modifier,
     label: String? = null,
-    size: Dp = 140.dp,
-    strokeWidth: Dp = 12.dp,
-    progressColor: Color = VoraMintProgress,
-    trackColor: Color = VoraTrack,
+    size: Dp = 64.dp,
+    strokeWidth: Dp? = null,
+    progressColor: Color = VoraGreen,
+    trackColor: Color = VoraBorder,
     valueColor: Color = VoraTextPrimary,
     labelColor: Color = VoraTextSecondary
 ) {
@@ -62,43 +64,26 @@ fun VoraCircularProgress(
         animationSpec = tween(durationMillis = 800),
         label = "voraCircularProgress"
     )
+    val stroke = strokeWidth ?: (size * 0.075f)
     Box(modifier = modifier.size(size), contentAlignment = Alignment.Center) {
-        Canvas(modifier = Modifier.fillMaxSize().padding(strokeWidth / 2)) {
-            val stroke = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round)
-            // Pista gris completa (360°).
-            drawArc(
-                color = trackColor,
-                startAngle = 0f,
-                sweepAngle = 360f,
-                useCenter = false,
-                style = stroke
-            )
+        Canvas(modifier = Modifier.fillMaxSize().padding(stroke / 2)) {
+            val style = Stroke(width = stroke.toPx(), cap = StrokeCap.Round)
+            // Pista completa (360°).
+            drawArc(color = trackColor, startAngle = 0f, sweepAngle = 360f, useCenter = false, style = style)
             // Arco de progreso: arranca arriba (-90°) y recorre progress * 360°.
-            drawArc(
-                color = progressColor,
-                startAngle = -90f,
-                sweepAngle = 360f * animated,
-                useCenter = false,
-                style = stroke
-            )
+            drawArc(color = progressColor, startAngle = -90f, sweepAngle = 360f * animated, useCenter = false, style = style)
         }
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
             Text(
                 text = centerText,
-                style = if (size >= 120.dp) MaterialTheme.typography.headlineMedium
-                else MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleSmall.copy(
+                    fontSize = if (size >= 120.dp) 28.sp else 16.sp,
+                    fontWeight = FontWeight.Bold
+                ),
                 color = valueColor
             )
             if (label != null) {
-                Text(
-                    text = label,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = labelColor,
-                    textAlign = TextAlign.Center
-                )
+                Text(label, style = MaterialTheme.typography.bodySmall, color = labelColor, textAlign = TextAlign.Center)
             }
         }
     }
