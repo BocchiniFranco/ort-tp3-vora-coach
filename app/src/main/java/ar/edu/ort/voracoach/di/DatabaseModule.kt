@@ -10,6 +10,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
+import ar.edu.ort.voracoach.data.local.dao.WorkoutDao
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -25,4 +26,8 @@ object DatabaseModule {
 
     @Provides
     fun provideMealDao(database: VoraDatabase): MealDao = database.mealDao()
+
+    /** DAO de la caché de entrenamientos (Integrante 2). */
+    @Provides
+    fun provideWorkoutDao(database: VoraDatabase): WorkoutDao = database.workoutDao()
 }
