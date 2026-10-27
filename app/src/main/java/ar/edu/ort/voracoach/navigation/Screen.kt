@@ -255,6 +255,8 @@ sealed class Screen(
                 // Y estas pantallas de Nutrición, con Nutrition activo.
                 DailyMeals.route,
                 AddFood.route,
+                PhotoAnalysis.route,
+                MealReviewConfirm.route,
                 MealDetail.route
             )
         }

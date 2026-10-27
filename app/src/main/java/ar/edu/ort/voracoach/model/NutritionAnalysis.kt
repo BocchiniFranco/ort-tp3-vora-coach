@@ -24,5 +24,14 @@ data class NutritionAnalysis(
     val items: List<AnalyzedFood>,
     val totals: Macros,
     val isSimulated: Boolean,
-    val requiresConfirmation: Boolean
-)
+    val requiresConfirmation: Boolean,
+    val preset: AnalysisPreset? = null
+) {
+    /** Tipo de comida en el que se guarda; "vegetarian" no dice cuál, se usa el de la hora. */
+    val mealType: MealType
+        get() = when (preset) {
+            AnalysisPreset.BREAKFAST -> MealType.BREAKFAST
+            AnalysisPreset.LUNCH -> MealType.LUNCH
+            AnalysisPreset.VEGETARIAN, null -> MealDates.suggestedMealType()
+        }
+}

@@ -13,6 +13,9 @@ import ar.edu.ort.voracoach.model.FoodPage
 import ar.edu.ort.voracoach.model.Meal
 import ar.edu.ort.voracoach.model.NutritionAnalysis
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -70,6 +73,18 @@ class NutritionRepository @Inject constructor(
         }
         response.body()?.toDomain()
             ?: throw NutritionDataException("The food list came back empty.")
+    }
+
+    private val _pendingAnalysis = MutableStateFlow<NutritionAnalysis?>(null)
+
+    /**
+     * Último análisis de voz o foto, a la espera de que el usuario lo revise en 5.7.
+     * Vive en memoria: no se guarda nada hasta que el usuario lo confirma.
+     */
+    val pendingAnalysis: StateFlow<NutritionAnalysis?> = _pendingAnalysis.asStateFlow()
+
+    fun setPendingAnalysis(analysis: NutritionAnalysis?) {
+        _pendingAnalysis.value = analysis
     }
 
     /** Con source TEXT hace falta [text]; con PHOTO el servidor usa una foto de ejemplo. */

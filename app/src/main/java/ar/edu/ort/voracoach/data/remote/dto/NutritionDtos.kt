@@ -1,5 +1,6 @@
 package ar.edu.ort.voracoach.data.remote.dto
 
+import ar.edu.ort.voracoach.model.AnalysisPreset
 import ar.edu.ort.voracoach.model.AnalyzedFood
 import ar.edu.ort.voracoach.model.Food
 import ar.edu.ort.voracoach.model.FoodPage
@@ -105,5 +106,6 @@ fun NutritionAnalysisDto.toDomain(): NutritionAnalysis = NutritionAnalysis(
     totals = totals?.toDomain() ?: Macros(0.0, 0.0, 0.0, 0.0),
     // Si el servidor no lo aclara, se asume lo más seguro: simulado y a confirmar
     isSimulated = isSimulated ?: true,
-    requiresConfirmation = requiresConfirmation ?: true
+    requiresConfirmation = requiresConfirmation ?: true,
+    preset = AnalysisPreset.entries.firstOrNull { it.apiValue == preset }
 )

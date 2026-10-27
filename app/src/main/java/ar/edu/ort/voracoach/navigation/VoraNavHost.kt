@@ -144,13 +144,17 @@ fun VoraNavHost(
  */
 private fun String?.toBottomDestination(): VoraBottomDestination? = when (this) {
     Screen.Notifications.route -> VoraBottomDestination.HOME
-    Screen.DailyMeals.route, Screen.AddFood.route, Screen.MealDetail.route -> VoraBottomDestination.NUTRITION
+    Screen.DailyMeals.route, Screen.AddFood.route, Screen.PhotoAnalysis.route,
+    Screen.MealReviewConfirm.route, Screen.MealDetail.route -> VoraBottomDestination.NUTRITION
     else -> VoraBottomDestination.entries.firstOrNull { it.route() == this }
 }
 
-/** Pantallas con fondo verde oscuro en el Figma (Voice / Listening, Processing y Speaking). */
+/** Pantallas con fondo verde oscuro en el Figma (estados de voz del coach y registro por voz de Nutrición). */
 private val darkRoutes: Set<String>
-    get() = setOf(Screen.CoachListening.route, Screen.CoachProcessing.route, Screen.CoachVoiceResponse.route)
+    get() = setOf(
+        Screen.CoachListening.route, Screen.CoachProcessing.route, Screen.CoachVoiceResponse.route,
+        Screen.VoiceFoodLog.route, Screen.FoodAnalysis.route
+    )
 
 /** Pantallas de acceso, con fondo #F3F9F5. */
 private val authRoutes: Set<String>
