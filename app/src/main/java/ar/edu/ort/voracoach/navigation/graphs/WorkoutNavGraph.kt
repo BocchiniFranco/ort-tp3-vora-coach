@@ -20,6 +20,9 @@ import ar.edu.ort.voracoach.model.WorkoutDemoData
 import ar.edu.ort.voracoach.navigation.Screen
 import ar.edu.ort.voracoach.navigation.placeholderDestination
 import ar.edu.ort.voracoach.ui.screens.workout.WeeklyPlanScreen
+import androidx.compose.runtime.LaunchedEffect
+import ar.edu.ort.voracoach.ui.screens.workout.ActiveWorkoutScreen
+import ar.edu.ort.voracoach.viewmodel.ActiveWorkoutViewModel
 
 /**
  * FLUJO 4 - ENTRENAMIENTO (Integrante 2).
@@ -112,7 +115,32 @@ fun NavGraphBuilder.workoutGraph(navController: NavHostController) {
             onStartWorkoutClick = { navController.navigate(Screen.ActiveWorkout.route) }
         )
     }
-    placeholderDestination(Screen.ActiveWorkout, navController)
+    // 4.5 Active Workout (demo SIMULADA): series, peso y cronómetro de descanso.
+    composable(Screen.ActiveWorkout.route) {
+        val viewModel: ActiveWorkoutViewModel = hiltViewModel()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+        // Cuando el ViewModel marca isFinished, navega a 4.7 UNA sola vez.
+        // popUpTo inclusive: "Atrás" desde 4.7 no vuelve al entrenamiento terminado.
+        LaunchedEffect(uiState.isFinished) {
+            if (uiState.isFinished) {
+                viewModel.onFinishHandled()
+                navController.navigate(Screen.WorkoutCompleted.route) {
+                    popUpTo(Screen.ActiveWorkout.route) { inclusive = true }
+                }
+            }
+        }
+
+        ActiveWorkoutScreen(
+            uiState = uiState,
+            onFinishWorkoutClick = viewModel::finishWorkout,
+            onDecreaseWeightClick = viewModel::decreaseWeight,
+            onIncreaseWeightClick = viewModel::increaseWeight,
+            onAddRestClick = viewModel::addRestTime,
+            onSkipRestClick = viewModel::skipRest,
+            onCompleteSetClick = viewModel::completeSet
+        )
+    }
     placeholderDestination(Screen.ExerciseGuide, navController)
     placeholderDestination(Screen.WorkoutCompleted, navController)
 }
