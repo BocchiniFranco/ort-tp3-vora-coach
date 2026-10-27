@@ -183,4 +183,39 @@ object WorkoutDemoData {
     /** Frase del coach durante el entrenamiento. */
     const val ACTIVE_WORKOUT_COACH_TIP =
         "\"Two more reps. Keep your chest elevated, brace your core, and control the bar's return.\""
+
+    // ----------------------------- 4.6 Exercise Guide -----------------------------
+
+    const val GUIDE_EXERCISE_NAME = "Seated Cable Row"
+    const val GUIDE_TARGET = "Target: Lats, Mid-Back, Rhomboids"
+
+    /** Pasos de ejecución, en orden. */
+    val guideSteps = listOf(
+        "Sit upright with your chest lifted.",
+        "Pull the handle toward your lower torso.",
+        "Keep your elbows tucked close to your ribs.",
+        "Pause briefly during peak contraction.",
+        "Return the weight slowly to start."
+    )
+
+    /** Consejos de técnica. */
+    val guideFormCues = listOf(
+        "Keep your shoulders rolled down and back.",
+        "Do not lean backward to swing the load."
+    )
+
+    const val GUIDE_ASK_VORA = "Ask Vora: \"Explain grip variations\""
+
+    // ---------------------------- 4.7 Workout Complete ----------------------------
+
+    const val COMPLETED_DURATION = "42 min"
+    const val COMPLETED_EXERCISES = "5/5"
+    const val COMPLETED_VOLUME = "2,340 kg"
+
+    const val COMPLETED_INSIGHT =
+        "You increased your Seated Cable Row volume by 8% compared with your previous " +
+                "session. Keep this controlled tempo next time."
+
+    /** Opciones para calificar la dificultad. */
+    val difficultyOptions = listOf("Great", "Good", "Tough", "Too Easy")
 }
