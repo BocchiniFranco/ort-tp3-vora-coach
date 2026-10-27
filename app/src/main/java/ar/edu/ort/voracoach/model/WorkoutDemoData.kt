@@ -55,24 +55,24 @@ object WorkoutDemoData {
     /** Sesiones de la semana (tarjetas de 4.2). */
     val plannedSessions = listOf(
         PlannedSession(
-            id = "w-upper-body",
+            id = "w01",   // ids reales del mock: cada tarjeta abre SU detalle (NAV04)
             dayLabel = "TODAY'S WORKOUT",
-            title = "Upper Body Strength",
-            details = "42 min • 5 exercises • Intermediate",
+            title = "Fuerza inicial",
+            details = "25 min • 3 exercises • Beginner",
             isToday = true
         ),
         PlannedSession(
-            id = "w-active-recovery",
+            id = "w02",
             dayLabel = "WEDNESDAY",
-            title = "Active Recovery",
-            details = "25 min • Mobility • Walk",
+            title = "Entrenamiento completo",
+            details = "35 min • 3 exercises • Intermediate",
             isRecovery = true
         ),
         PlannedSession(
-            id = "w-lower-body",
+            id = "w03",
             dayLabel = "THURSDAY",
-            title = "Lower Body Strength",
-            details = "45 min • 6 exercises"
+            title = "Fuerza y constancia",
+            details = "30 min • 3 exercises • Beginner"
         )
     )
 
