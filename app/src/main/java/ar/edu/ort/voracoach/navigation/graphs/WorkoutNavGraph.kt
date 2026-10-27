@@ -20,6 +20,12 @@ import ar.edu.ort.voracoach.model.WorkoutDemoData
 import ar.edu.ort.voracoach.navigation.Screen
 import ar.edu.ort.voracoach.navigation.placeholderDestination
 import ar.edu.ort.voracoach.ui.screens.workout.WeeklyPlanScreen
+import androidx.compose.runtime.LaunchedEffect
+import ar.edu.ort.voracoach.ui.screens.workout.ActiveWorkoutScreen
+import ar.edu.ort.voracoach.viewmodel.ActiveWorkoutViewModel
+import androidx.compose.runtime.mutableStateOf
+import ar.edu.ort.voracoach.ui.screens.workout.ExerciseGuideScreen
+import ar.edu.ort.voracoach.ui.screens.workout.WorkoutCompletedScreen
 
 /**
  * FLUJO 4 - ENTRENAMIENTO (Integrante 2).
@@ -112,7 +118,64 @@ fun NavGraphBuilder.workoutGraph(navController: NavHostController) {
             onStartWorkoutClick = { navController.navigate(Screen.ActiveWorkout.route) }
         )
     }
-    placeholderDestination(Screen.ActiveWorkout, navController)
-    placeholderDestination(Screen.ExerciseGuide, navController)
-    placeholderDestination(Screen.WorkoutCompleted, navController)
+    // 4.5 Active Workout (demo SIMULADA): series, peso y cronómetro de descanso.
+    composable(Screen.ActiveWorkout.route) {
+        val viewModel: ActiveWorkoutViewModel = hiltViewModel()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+        // Cuando el ViewModel marca isFinished, navega a 4.7 UNA sola vez.
+        // popUpTo inclusive: "Atrás" desde 4.7 no vuelve al entrenamiento terminado.
+        LaunchedEffect(uiState.isFinished) {
+            if (uiState.isFinished) {
+                viewModel.onFinishHandled()
+                navController.navigate(Screen.WorkoutCompleted.route) {
+                    popUpTo(Screen.ActiveWorkout.route) { inclusive = true }
+                }
+            }
+        }
+
+        ActiveWorkoutScreen(
+            uiState = uiState,
+            onFinishWorkoutClick = viewModel::finishWorkout,
+            onDecreaseWeightClick = viewModel::decreaseWeight,
+            onIncreaseWeightClick = viewModel::increaseWeight,
+            onAddRestClick = viewModel::addRestTime,
+            onSkipRestClick = viewModel::skipRest,
+            onCompleteSetClick = viewModel::completeSet
+        )
+    }
+    // 4.6 Exercise Guide (demo): guía de ejecución de un ejercicio.
+    composable(Screen.ExerciseGuide.route) {
+        ExerciseGuideScreen(
+            exerciseName = WorkoutDemoData.GUIDE_EXERCISE_NAME,
+            target = WorkoutDemoData.GUIDE_TARGET,
+            steps = WorkoutDemoData.guideSteps,
+            formCues = WorkoutDemoData.guideFormCues,
+            askVoraText = WorkoutDemoData.GUIDE_ASK_VORA,
+            onBackClick = { navController.popBackStack() },
+            // "?" abre el chat con VORA; "Ask Vora" el asistente de voz (simulados)
+            onHelpClick = { navController.navigate(Screen.CoachConversation.route) },
+            onAskVoraClick = { navController.navigate(Screen.CoachReady.route) },
+            onBackToWorkoutClick = { navController.popBackStack() }
+        )
+    }
+
+    // 4.7 Workout Complete (demo): resumen y calificación de dificultad.
+    composable(Screen.WorkoutCompleted.route) {
+        // Opción de dificultad elegida (null = ninguna). Sobrevive a la rotación.
+        var difficulty by rememberSaveable { mutableStateOf<String?>(null) }
+
+        WorkoutCompletedScreen(
+            selectedDifficulty = difficulty,
+            difficultyOptions = WorkoutDemoData.difficultyOptions,
+            onDifficultySelected = { option -> difficulty = option },
+            // "Done": vuelve al dashboard y limpia la pila del entrenamiento
+            onDoneClick = {
+                navController.navigate(Screen.WorkoutDashboard.route) {
+                    popUpTo(Screen.WorkoutDashboard.route) { inclusive = true }
+                    launchSingleTop = true
+                }
+            }
+        )
+    }
 }
