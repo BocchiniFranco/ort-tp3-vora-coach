@@ -1,16 +1,13 @@
 package ar.edu.ort.voracoach.navigation.graphs
 
-import ar.edu.ort.voracoach.ui.screens.workout.WorkoutDetailScreen
-import ar.edu.ort.voracoach.viewmodel.WorkoutDetailViewModel
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import ar.edu.ort.voracoach.ui.screens.workout.WorkoutDashboardScreen
-import ar.edu.ort.voracoach.viewmodel.WorkoutViewModel
-import ar.edu.ort.voracoach.ui.screens.workout.PreWorkoutScreen
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -18,21 +15,22 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import ar.edu.ort.voracoach.model.WorkoutDemoData
 import ar.edu.ort.voracoach.navigation.Screen
-import ar.edu.ort.voracoach.navigation.placeholderDestination
-import ar.edu.ort.voracoach.ui.screens.workout.WeeklyPlanScreen
-import androidx.compose.runtime.LaunchedEffect
 import ar.edu.ort.voracoach.ui.screens.workout.ActiveWorkoutScreen
-import ar.edu.ort.voracoach.viewmodel.ActiveWorkoutViewModel
-import androidx.compose.runtime.mutableStateOf
 import ar.edu.ort.voracoach.ui.screens.workout.ExerciseGuideScreen
+import ar.edu.ort.voracoach.ui.screens.workout.PreWorkoutScreen
+import ar.edu.ort.voracoach.ui.screens.workout.WeeklyPlanScreen
 import ar.edu.ort.voracoach.ui.screens.workout.WorkoutCompletedScreen
+import ar.edu.ort.voracoach.ui.screens.workout.WorkoutDashboardScreen
+import ar.edu.ort.voracoach.ui.screens.workout.WorkoutDetailScreen
+import ar.edu.ort.voracoach.viewmodel.ActiveWorkoutViewModel
+import ar.edu.ort.voracoach.viewmodel.WorkoutDetailViewModel
+import ar.edu.ort.voracoach.viewmodel.WorkoutViewModel
 
 /**
  * FLUJO 4 - ENTRENAMIENTO (Integrante 2).
  *
  * Cada composable(...) asocia una ruta con su pantalla real y decide a dónde
  * lleva cada botón. Las pantallas no conocen al NavController: solo avisan eventos.
- * Las que siguen con placeholderDestination(...) están pendientes.
  */
 fun NavGraphBuilder.workoutGraph(navController: NavHostController) {
     // 4.1 Workout Dashboard (FUNCIONAL): catálogo real con Retrofit (RF01, RF05).

@@ -11,11 +11,11 @@ Kotlin · Jetpack Compose · Material 3 · Clean Architecture + MVVM · Hilt/Dag
 
 ## 1. Integrantes
 
-| # | Integrante | Responsabilidad |
-|---|---|---|
+| # | Integrante      | Responsabilidad |
+|---|-----------------|---|
 | 1 | Franco Bocchini | Base del proyecto (Gradle, Hilt, tema, componentes reutilizables), navegación (37 rutas) y flujos 1, 2 y 3 |
-| 2 | _(completar)_ | Entrenamiento funcional con Retrofit + caché Room (flujo 4) y Progreso (flujo 6) |
-| 3 | _(completar)_ | Nutrición funcional con Room (flujo 5), Perfil (flujo 7) y documentación |
+| 2 | Mateo Gago      | Entrenamiento funcional con Retrofit + caché Room (flujo 4) y Progreso (flujo 6) |
+| 3 | _(completar)_   | Nutrición funcional con Room (flujo 5), Perfil (flujo 7) y documentación |
 
 ## 2. Diseño de referencia (Figma)
 
@@ -46,7 +46,7 @@ botones, chips, filas de lista, gráficos y vistas de estado (Loading / Empty / 
 La columna *Avance* se actualiza en cada entrega (⏳ placeholder navegable · ✅ pantalla final).
 
 | Nº | Pantalla (Figma) | Ruta | Tipo | Resp. | Avance |
-|---|---|---|---|---|---|
+|---|---|---|---|---|--|
 | 1.1 | Login | `access/login` | Demostración | I1 | ✅ |
 | 1.2 | Register | `access/register` | Demostración | I1 | ✅ |
 | 2.1 | Home Dashboard | `home/dashboard` | Demostración | I1 | ✅ |
@@ -57,13 +57,13 @@ La columna *Avance* se actualiza en cada entrega (⏳ placeholder navegable · �
 | 3.4 | Coach Voice Response | `coach/voice-response` | Demostración | I1 | ✅ |
 | 3.5 | Coach Conversation | `coach/conversation` | Demostración | I1 | ✅ |
 | 3.6 | Coach Mic Error | `coach/mic-error` | Demostración | I1 | ✅ |
-| 4.1 | Workout Dashboard | `workout/dashboard` | **Funcional** (GET `/v1/workouts` + Room) | I2 | ⏳ |
-| 4.2 | Weekly Plan | `workout/weekly-plan` | Demostración | I2 | ⏳ |
-| 4.3 | Workout Detail | `workout/detail/{workoutId}` | **Funcional** (GET `/v1/workouts/{workoutId}` + Room) | I2 | ⏳ |
-| 4.4 | Workout Prep | `workout/prep` | Demostración | I2 | ⏳ |
-| 4.5 | Active Workout | `workout/active` | Demostración | I2 | ⏳ |
-| 4.6 | Exercise Guide | `workout/exercise-guide` | Demostración | I2 | ⏳ |
-| 4.7 | Workout Completed | `workout/completed` | Demostración | I2 | ⏳ |
+| 4.1 | Workout Dashboard | `workout/dashboard` | **Funcional** (GET `/v1/workouts` + Room) | I2 | ✅ |
+| 4.2 | Weekly Plan | `workout/weekly-plan` | Demostración | I2 | ✅ |
+| 4.3 | Workout Detail | `workout/detail/{workoutId}` | **Funcional** (GET `/v1/workouts/{workoutId}` + Room) | I2 | ✅ |
+| 4.4 | Workout Prep | `workout/prep` | Demostración | I2 | ✅ |
+| 4.5 | Active Workout | `workout/active` | Demostración | I2 | ✅ |
+| 4.6 | Exercise Guide | `workout/exercise-guide` | Demostración | I2 | ✅ |
+| 4.7 | Workout Completed | `workout/completed` | Demostración | I2 | ✅ |
 | 5.1 | Nutrition Dashboard | `nutrition/dashboard` | **Funcional** (totales diarios Room) | I3 | ⏳ |
 | 5.2 | Daily Meals | `nutrition/meals/{date}` | **Funcional** (listado por fecha + baja Room) | I3 | ⏳ |
 | 5.3 | Add Food | `nutrition/add?date={date}&mealType={mealType}` | **Funcional** (alta manual Room) | I3 | ⏳ |
@@ -72,12 +72,12 @@ La columna *Avance* se actualiza en cada entrega (⏳ placeholder navegable · �
 | 5.6 | Photo Analysis | `nutrition/photo-analysis` | Demostración (sin cámara) | I3 | ⏳ |
 | 5.7 | Meal Review & Confirm | `nutrition/review` | Demostración | I3 | ⏳ |
 | 5.8 | Meal Detail | `nutrition/meal/{mealId}` | **Funcional** (lectura + baja Room) | I3 | ⏳ |
-| 6.1 | Daily Summary | `progress/daily-summary` | Demostración | I2 | ⏳ |
-| 6.2 | Progress Dashboard | `progress/dashboard` | Demostración | I2 | ⏳ |
-| 6.3 | Workout Progress | `progress/workouts` | Demostración | I2 | ⏳ |
-| 6.4 | Nutrition Progress | `progress/nutrition` | Demostración | I2 | ⏳ |
-| 6.5 | Health Trends | `progress/health-trends` | Demostración | I2 | ⏳ |
-| 6.6 | Weekly Review | `progress/weekly-review` | Demostración | I2 | ⏳ |
+| 6.1 | Daily Summary | `progress/daily-summary` | Demostración | I2 | ✅ |
+| 6.2 | Progress Dashboard | `progress/dashboard` | Demostración | I2 | ✅ |
+| 6.3 | Workout Progress | `progress/workouts` | Demostración | I2 | ✅ |
+| 6.4 | Nutrition Progress | `progress/nutrition` | Demostración | I2 | ✅ |
+| 6.5 | Health Trends | `progress/health-trends` | Demostración | I2 | ✅ |
+| 6.6 | Weekly Review | `progress/weekly-review` | Demostración | I2 | ✅ |
 | 7.1 | Profile Dashboard | `profile/dashboard` | Demostración (Alex Morgan) | I3 | ⏳ |
 | 7.2 | Edit Profile | `profile/edit` | Demostración | I3 | ⏳ |
 | 7.3 | Goals & Preferences | `profile/goals` | Demostración | I3 | ⏳ |
