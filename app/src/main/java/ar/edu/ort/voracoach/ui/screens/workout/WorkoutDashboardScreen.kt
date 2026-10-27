@@ -88,6 +88,9 @@ fun WorkoutDashboardScreen(
     onSlowModeChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // Entrenamiento "de hoy": el primero del catálogo real. Si todavía no cargó, es null.
+    val todayWorkout = (uiState as? WorkoutsUiState.Success)?.workouts?.firstOrNull()
+
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 24.dp),
@@ -107,8 +110,12 @@ fun WorkoutDashboardScreen(
         // Tarjeta oscura "READY FOR TODAY?"
         item {
             TodayWorkoutCard(
+                todayWorkout = todayWorkout,
                 onStartWorkoutClick = onStartWorkoutClick,
-                onDetailsClick = onTodayDetailsClick,
+                // Si hay un entrenamiento real, "Details" abre SU detalle (4.3, NAV04)
+                onDetailsClick = {
+                    if (todayWorkout != null) onWorkoutClick(todayWorkout.id) else onTodayDetailsClick()
+                },
                 modifier = Modifier.padding(horizontal = VoraScreenPadding)
             )
         }
@@ -202,26 +209,33 @@ fun WorkoutDashboardScreen(
     }
 }
 
-/** Tarjeta oscura del entrenamiento de hoy (datos de demostración). */
+/**
+ * Tarjeta oscura del entrenamiento de hoy. Muestra el primero del catálogo real;
+ * si todavía no cargó (null), muestra los datos de demostración.
+ */
 @Composable
 private fun TodayWorkoutCard(
+    todayWorkout: Workout?,
     onStartWorkoutClick: () -> Unit,
     onDetailsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // "?:" (Elvis): si todayWorkout es null, usa el valor de demostración
+    val title = todayWorkout?.name ?: WorkoutDemoData.TODAY_WORKOUT_TITLE
+    val summary = todayWorkout?.let {
+        "${it.durationMinutes} min • ${it.exerciseCount} exercises • " +
+                it.level.replaceFirstChar { letter -> letter.uppercase() }
+    } ?: WorkoutDemoData.TODAY_WORKOUT_FOCUS
+
     VoraHeroCard(modifier = modifier) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             VoraHeroLabel(text = "Ready for today?")
             Spacer(Modifier.weight(1f))
             VoraHeroPill(text = WorkoutDemoData.TODAY_WORKOUT_INTENSITY)
         }
+        Text(title, style = MaterialTheme.typography.titleLarge, color = Color.White)
         Text(
-            WorkoutDemoData.TODAY_WORKOUT_TITLE,
-            style = MaterialTheme.typography.titleLarge,
-            color = Color.White
-        )
-        Text(
-            WorkoutDemoData.TODAY_WORKOUT_FOCUS,
+            summary,
             style = MaterialTheme.typography.bodySmall,
             color = Color.White.copy(alpha = 0.75f)
         )
