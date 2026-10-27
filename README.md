@@ -22,19 +22,30 @@ Kotlin · Jetpack Compose · Material 3 · Clean Architecture + MVVM · Hilt/Dag
 - Figma oficial: <https://www.figma.com/design/1nvbbfYNYmKAevuaG28J85/Parcial-Domiciliario-7-Oct-26?node-id=0-1&t=peHUvazKqQXoO66S-1>
 - Repositorio de ejemplo de la cátedra (base de versiones y patrones): <https://github.com/hugoguarneri/ort-tp3-simulacro-parcial>
 
-### Sistema de diseño implementado (`ui/theme/Color.kt`)
+### Sistema de diseño implementado (`ui/theme/`)
+
+Los valores salen de la página *Sistema de diseño — VORA* del Figma (colores, tipografía, espaciado y radios).
 
 | Token | Hex | Uso |
 |---|---|---|
-| `VoraBackground` | `#F5F8F7` | Fondo general |
-| `VoraSurface` / `CardBackground` | `#FFFFFF` | Tarjetas (radio 20–24 dp) |
-| `VoraDarkGreen` | `#103B31` | Hero cards, botones primarios |
-| `VoraSecondaryGreen` | `#225046` | Sub-botones dentro de hero cards |
-| `VoraAccentLime` | `#C6E854` | CTA sobre tarjetas oscuras, acentos |
-| `VoraLightMint` | `#E3F5EE` (borde `#CBE8DC`) | Banners de IA / recomendaciones |
-| `VoraMintProgress` | `#4CC39A` | Barras y anillos de progreso |
-| `VoraTextPrimary` / `VoraTextSecondary` | `#111C18` / `#687672` | Textos |
-| `VoraStatusError` | `#D9534F` | Errores y acciones destructivas |
+| `VoraGreen` | `#123D35` | Hero cards, botones primarios, pantallas oscuras del asistente |
+| `VoraMint` | `#65D6B0` | Progreso, estado activo del asistente, acentos |
+| `VoraLime` | `#C9E86A` | CTA principal (Start voice session, Tap to Interrupt) |
+| `VoraBackground` | `#F7F8F5` | Fondo general |
+| `VoraSurface` | `#FFFFFF` | Tarjetas |
+| `VoraBorder` | `#E4E9E6` | Bordes, divisores y pistas de progreso |
+| `VoraTextPrimary` / `VoraTextSecondary` / `VoraTextTertiary` | `#17211F` / `#68736F` / `#9AA39F` | Textos |
+| `VoraStatusError` / `VoraSuccess` | `#D95D5D` / `#27AE60` | Errores y confirmaciones |
+| `VoraMintTranslucent` | menta al 12 % (borde al 25 %) | Banners de IA / recomendaciones |
+| `AuthGreen`, `AuthLime`, `AuthBackground`… | `#0E382F`, `#CCE65E`, `#F3F9F5`… | Paleta propia de Login y Register |
+
+Los nombres anteriores (`VoraDarkGreen`, `VoraAccentLime`, `VoraMintProgress`, `CardBackground`, etc.)
+quedan como alias de los nuevos, así las pantallas que los usan siguen compilando.
+
+- **Tipografía** (`Type.kt`): **Manrope** (Regular, Medium, SemiBold y Bold, incluida en `res/font/`),
+  con la escala del Figma: títulos de 20 a 26 sp, cuerpo de 13 a 15 sp y etiquetas de 10 a 14 sp.
+- **Radios** (`Theme.kt`): 8, 12, 16, 20 y 24 dp; botones tipo píldora.
+- **Íconos**: exportados del Figma como VectorDrawables (`res/drawable/ic_*.xml`).
 
 Componentes reutilizables (`ui/components/`): `VoraBottomBar`, `VoraHeroCard`, `VoraTipBanner`,
 `VoraCircularProgress`, `VoraMacroProgressBar`, `VoraOrbGraphic`, además de `VoraTopBar`, `VoraCard`,
@@ -215,6 +226,9 @@ El procesador de anotaciones es **KSP**: genera el código de Dagger y de Room e
 2. Clonar el repo y abrirlo con **File → Open**.
 3. Esperar la sincronización de Gradle.
 4. Elegir un emulador o teléfono (minSdk 24) y tocar **Run ▶**.
+5. Ingresar: no hay autenticación real (la consigna no la pide). Se entra al Home como Alex Morgan
+   con cualquiera de los botones Apple, Google o Face ID, o con un email válido y una contraseña
+   de 8 caracteres o más (por ejemplo `alex@vora.com` / `12345678`).
 
 | Tecnología | Versión |
 |---|---|
@@ -292,7 +306,7 @@ npx codeburn
 
 | Integrante | Herramienta | Tokens / costo reportado por Codeburn |
 |---|---|---|
-| Franco Bocchini | Claude Code (modelo Opus 5.5) | 340 llamadas · 106.938.503 tokens (98 % lectura de caché) · costo estimado US$ 42,96 — medido el 21/10/2026 con `npx codeburn overview --period all` |
+| Franco Bocchini | Claude Code (modelo Opus 5.5) | 521 llamadas · 192.743.700 tokens (98 % lectura de caché) · costo estimado US$ 72,03 — medido el 27/10/2026 con `npx codeburn overview --period all --project TP3-Parcial` |
 | Mateo Gago | Claude app(nube) | Codeburn local: $0.00 / 0 sesiones en los últimos 30 días (período del TP). La asistencia se hizo desde la app de Claude en la nube, que no deja registros locales que Codeburn pueda leer [Captura](docs/capturas/codeburn_integrante2.png) |
 | Hugo Guarneri | Claude Code (Opus 5.5) | Codeburn, 1 sesión dedicada al parcial (21 al 27/10): USD 65,38 de la sesión + USD 4,67 de 1 subagente (≈ USD 70 a precio de API), 403 llamadas y ~205 M tokens, el 98 % lectura de caché. [Captura](docs/capturas/codeburn_integrante3.png) |
 
@@ -305,6 +319,9 @@ npx codeburn
 | 3 | 5.1 Nutrition Dashboard (funcional: comidas y totales del día en Room) | <img src="docs/capturas/figma_5_1.png" width="220"> | <img src="docs/capturas/app_5_1.png" width="220"> |
 | 4 | 5.8 Meal Details (funcional: lectura y baja con confirmación en Room) | <img src="docs/capturas/figma_5_8.png" width="220"> | <img src="docs/capturas/app_5_8.png" width="220"> |
 | 5 | 7.1 Profile Dashboard | <img src="docs/capturas/figma_7_1.png" width="220"> | <img src="docs/capturas/app_7_1.png" width="220"> |
+| 6 | 1.1 Login | <img src="docs/capturas/figma_1_1.png" width="220"> | <img src="docs/capturas/app_1_1.png" width="220"> |
+| 7 | 2.1 Home Dashboard | <img src="docs/capturas/figma_2_1.png" width="220"> | <img src="docs/capturas/app_2_1.png" width="220"> |
+| 8 | 3.4 Voice Speaking (asistente respondiendo) | <img src="docs/capturas/figma_3_4.png" width="220"> | <img src="docs/capturas/app_3_4.png" width="220"> |
 
 ## 11. Video de demostración
 
