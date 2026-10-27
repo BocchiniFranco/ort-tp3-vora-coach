@@ -285,9 +285,9 @@ npx codeburn
 ## 10. Comparaciones visuales Figma vs. app (UI01)
 
 | # | Pantalla | Figma | App |
-|---|---|---|---|
-| 1 | _(completar)_ | _(captura)_ | _(captura)_ |
-| 2 | _(completar)_ | _(captura)_ | _(captura)_ |
+|---|--|--|--|
+| 1 | 4.1 Workout Dashboard (funcional: Retrofit + Room) | <img src="docs/capturas/figma_4_1.jpg" width="220"> | <img src="docs/capturas/app_4_1.png" width="220"> <img src="docs/capturas/app_4_1_catalogo.png" width="220"> |
+| 2 | 6.2 Progress Dashboard | <img src="docs/capturas/figma_6_2.jpg" width="220"> | <img src="docs/capturas/app_6_2.png" width="220"> |
 | 3 | _(completar)_ | _(captura)_ | _(captura)_ |
 | 4 | _(completar)_ | _(captura)_ | _(captura)_ |
 | 5 | _(completar)_ | _(captura)_ | _(captura)_ |
