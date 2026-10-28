@@ -293,7 +293,7 @@ npx codeburn
 |--------------|------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Integrante 1 | Claude Code      | _(completar con la salida de Codeburn)_                                                                                                                                                                                                      |
 | Mateo Gago   | Claude app(nube) | Codeburn local: $0.00 / 0 sesiones en los últimos 30 días (período del TP). La asistencia se hizo desde la app de Claude en la nube, que no deja registros locales que Codeburn pueda leer [Captura](docs/capturas/codeburn_integrante2.png) |
-| Integrante 3 | _(completar)_    | _(completar)_                                                                                                                                                                                                                                |
+| Hugo Guarneri | Claude Code (Opus 5.5) | Codeburn, 1 sesión dedicada al parcial (21 al 27/10): USD 65,38 de la sesión + USD 4,67 de 1 subagente (≈ USD 70 a precio de API), 403 llamadas y ~205 M tokens, el 98 % lectura de caché. [Captura](docs/capturas/codeburn_integrante3.png) |
 
 ## 10. Comparaciones visuales Figma vs. app (UI01)
 
