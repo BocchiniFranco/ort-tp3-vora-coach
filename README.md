@@ -54,7 +54,7 @@ botones, chips, filas de lista, gráficos y vistas de estado (Loading / Empty / 
 ## 3. Inventario de pantallas (NAV01)
 
 **Funcional** = consume datos reales (Retrofit y/o Room). **Demostración** = navegable con datos locales de ejemplo.
-La columna *Avance* se actualiza en cada entrega (⏳ placeholder navegable · ✅ pantalla final).
+Las 37 pantallas están terminadas (✅) y no queda ningún destino provisorio en los grafos de navegación.
 
 | Nº | Pantalla (frame del Figma) | Ruta | Tipo | Resp. | Avance |
 |---|---|---|---|---|---|
@@ -120,14 +120,17 @@ app/src/main/java/ar/edu/ort/voracoach/
 │   ├── theme/                  Color.kt, Type.kt, Theme.kt
 │   ├── components/             componentes reutilizables VORA
 │   └── screens/<flujo>/        pantallas sin estado (uiState + lambdas onXClick)
-├── viewmodel/                  XUiState (sealed interface) + XViewModel (@HiltViewModel)
-├── model/                      modelos de dominio que consume la UI
+├── viewmodel/                  XUiState (sealed interface / data class) + XViewModel (@HiltViewModel)
+├── model/                      modelos de dominio que consume la UI y datos de demostración
 ├── data/
-│   ├── remote/                 WorkoutApiService (Retrofit) + dto/ (ApiResponseDto<T>, ErrorResponseDto)
+│   ├── remote/                 WorkoutApiService, NutritionApiService (Retrofit) + dto/ (ApiResponseDto<T>, ErrorResponseDto)
 │   │                           + MockScenarioConfig y MockHeaderInterceptor (headers X-Mock-*)
-│   ├── local/                  VoraDatabase, entity/ (@Entity), dao/ (@Dao)
-│   └── repository/             WorkoutRepository, NutritionRepository
-└── di/                         NetworkModule, DatabaseModule (@Module @InstallIn(SingletonComponent))
+│   ├── local/                  VoraDatabase, entity/ (MealEntity, WorkoutEntities), dao/ (MealDao, WorkoutDao)
+│   └── repository/             WorkoutRepository, NutritionRepository, ProfileRepository, NotificationRepository
+└── di/                         NetworkModule, NutritionApiModule, DatabaseModule (@Module @InstallIn(SingletonComponent))
+
+mock/                           mock local de la cátedra (Python, ver sección 5.2)
+docs/capturas/                  capturas de las comparaciones Figma vs. app
 ```
 
 Flujo de dependencias: **UI → ViewModel → Repository → DataSource (Retrofit / Room DAO)**. La UI nunca llama a
@@ -155,20 +158,43 @@ cifrar (`usesCleartextTraffic`) para estas URLs locales.
 > El servidor publicado resuelve a una IP privada (`100.112.x.x`) y no responde desde redes externas: para
 > desarrollar y para la defensa usamos el mock local.
 
-### 5.2 Levantar el mock local de la cátedra
+### 5.2 Mock local de la cátedra (`mock/`)
 
-El mock (`server.py`) es material del curso y **no se sube a este repositorio** (`/mock/` y `/tools/mock-server/`
-están en `.gitignore`). Cada integrante lo descarga del material de la materia. Solo necesita Python 3.9+, sin
-dependencias:
+El repositorio incluye en `mock/` el servidor de prueba que entregó la cátedra, sin modificaciones, para que
+cualquiera pueda clonar el proyecto y probar la app sin depender del servidor publicado.
+
+| Archivo | Para qué sirve |
+|---|---|
+| `server.py` | Servidor HTTP del contrato VORA (`/health`, `/v1/workouts`, `/v1/foods`, `/v1/nutrition/analyses`, etc.) |
+| `fixtures.json` / `examples.json` | Datos ficticios que devuelve el servidor (entrenamientos, alimentos, análisis) |
+| `openapi.json` + `docs/` | Contrato OpenAPI y Swagger UI, en `http://localhost:8000/docs` |
+| `test_server.py` | 12 pruebas automáticas del propio mock |
+
+**Condiciones para usarlo**
+
+- **Requisitos:** Python 3.9 o superior. Usa solo la biblioteca estándar: no hay que instalar dependencias ni
+  configurar credenciales.
+- **Solo para desarrollo, pruebas y la defensa.** Escucha por HTTP sin cifrar y sin autenticación, con datos
+  ficticios: no debe exponerse a internet. Por defecto escucha solo en la PC (`127.0.0.1`).
+- **No modificar los archivos:** son el contrato de la cátedra. La app tiene que funcionar con el mock tal como está.
+- **Dejar la terminal abierta** mientras se usa la app: al cerrarla, el servidor se detiene (`Ctrl+C`).
+- **Configurar `api.properties`** según el dispositivo (tabla de la sección 5.1). En `main` queda
+  `vora.server=mock` con la URL del emulador. Si se cambia la URL para probar en un teléfono, ese cambio no se commitea.
+- **Teléfono por USB:** `adb reverse tcp:8000 tcp:8000` se pierde al desconectar el cable; hay que volver a
+  ejecutarlo cada vez.
+- **Teléfono por Wi-Fi:** levantar el mock con `--host 0.0.0.0`, que la PC y el teléfono estén en la misma red y
+  permitir el puerto 8000 en el firewall de Windows.
 
 ```bash
-cd ruta/al/mock
-python server.py                  # escucha en http://127.0.0.1:8000 (emulador o adb reverse)
+cd mock
+python server.py                  # escucha en http://127.0.0.1:8000 (emulador o teléfono con adb reverse)
 python server.py --host 0.0.0.0   # además acepta conexiones desde la red Wi-Fi
-python test_server.py             # pruebas del propio mock (deben dar OK)
+python server.py --port 8080      # otro puerto (también se pueden usar las variables HOST y PORT)
+python test_server.py             # pruebas del propio mock (deben terminar en OK)
 ```
 
-Con el mock corriendo, `http://localhost:8000/docs` muestra el contrato en Swagger UI.
+En Windows, si `python` no está en el PATH, se usa el lanzador `py` (por ejemplo `py server.py`).
+Para comprobar que responde: `http://localhost:8000/health` devuelve `{"status": "ok", "service": "vora-mock", ...}`.
 
 ### 5.3 Contrato usado por la app
 
@@ -202,6 +228,10 @@ El `MockHeaderInterceptor` de OkHttp agrega estos headers a cada request:
 | | `error` | HTTP 503 `SERVICE_UNAVAILABLE` | error con reintento, sin borrar la caché de Room |
 | | `malformed` | **HTTP 200** con JSON inválido | error con reintento: el fallo aparece al parsear (Gson), no en `isSuccessful` |
 | `X-Mock-Delay-Ms` | `0` a `10000` | responde con esa demora | estado Loading |
+
+El escenario se elige desde la propia app, sin tocar código: en **4.1 Workout Dashboard**, al final de la
+pantalla, la tarjeta *Mock server scenario (testing)* tiene un chip por escenario y el interruptor
+*Slow response (3 s delay)*.
 
 ## 6. Hilt y su relación con Dagger (RF08)
 
@@ -278,12 +308,9 @@ principalmente los archivos de su flujo para evitar conflictos.
 
 | Integrante | Grafo de navegación | Pantallas | ViewModels / datos |
 |---|---|---|---|
-| 1 | `graphs/AccessNavGraph.kt`, `HomeNavGraph.kt`, `CoachNavGraph.kt` | `ui/screens/login`, `register`, `home`, `coach` | `AuthViewModel`, `HomeViewModel`, `NotificationsViewModel`, `CoachConversationViewModel` |
-| 2 | `graphs/WorkoutNavGraph.kt`, `ProgressNavGraph.kt` | `ui/screens/workout`, `progress` | `WorkoutViewModel`, `data/remote`, `WorkoutRepository`, entidades/DAO de workouts |
-| 3 | `graphs/NutritionNavGraph.kt`, `ProfileNavGraph.kt` | `ui/screens/nutrition`, `profile` | `NutritionViewModel`, `NutritionRepository`, `VoraDatabase`, `MealEntity`/`MealDao` |
-
-Para reemplazar una pantalla provisoria basta cambiar `placeholderDestination(Screen.X, navController)` por un
-`composable(Screen.X.route) { ... }` con la pantalla real en el grafo correspondiente.
+| 1 | `graphs/AccessNavGraph.kt`, `HomeNavGraph.kt`, `CoachNavGraph.kt` | `ui/screens/login`, `register`, `home`, `coach` | `AuthViewModel`, `HomeViewModel`, `NotificationsViewModel`, `CoachConversationViewModel`; tema y componentes |
+| 2 | `graphs/WorkoutNavGraph.kt`, `ProgressNavGraph.kt` | `ui/screens/workout`, `progress` | `WorkoutViewModel`, `WorkoutDetailViewModel`, `ActiveWorkoutViewModel`, `WorkoutRepository`, `NetworkModule`, `WorkoutDao` |
+| 3 | `graphs/NutritionNavGraph.kt`, `ProfileNavGraph.kt` | `ui/screens/nutrition`, `profile` | `NutritionViewModel`, `MealAnalysisViewModel`, `ProfileViewModel`, `NutritionRepository`, `VoraDatabase`, `MealDao` |
 
 ## 9. Uso de IA generativa (declaración)
 
@@ -307,7 +334,7 @@ npx codeburn
 | Integrante | Herramienta | Tokens / costo reportado por Codeburn |
 |---|---|---|
 | Franco Bocchini | Claude Code (modelo Opus 5.5) | 521 llamadas · 192.743.700 tokens (98 % lectura de caché) · costo estimado US$ 72,03 — medido el 27/10/2026 con `npx codeburn overview --period all --project TP3-Parcial` |
-| Mateo Gago | Claude app(nube) | Codeburn local: $0.00 / 0 sesiones en los últimos 30 días (período del TP). La asistencia se hizo desde la app de Claude en la nube, que no deja registros locales que Codeburn pueda leer [Captura](docs/capturas/codeburn_integrante2.png) |
+| Mateo Gago | Claude (app en la nube) | Codeburn local: $0.00 / 0 sesiones en los últimos 30 días (período del TP). La asistencia se hizo desde la app de Claude en la nube, que no deja registros locales que Codeburn pueda leer [Captura](docs/capturas/codeburn_integrante2.png) |
 | Hugo Guarneri | Claude Code (Opus 5.5) | Codeburn, 1 sesión dedicada al parcial (21 al 27/10): USD 65,38 de la sesión + USD 4,67 de 1 subagente (≈ USD 70 a precio de API), 403 llamadas y ~205 M tokens, el 98 % lectura de caché. [Captura](docs/capturas/codeburn_integrante3.png) |
 
 ## 10. Comparaciones visuales Figma vs. app (UI01)
@@ -325,4 +352,21 @@ npx codeburn
 
 ## 11. Video de demostración
 
-_(link al video)_
+_(pendiente: se agrega el link cuando el video esté grabado)_
+
+## 12. Pruebas realizadas
+
+Probado el 27/10/2026 en un **Samsung Galaxy A50** (Android 11) conectado por USB, contra el mock de `mock/`
+(`adb reverse tcp:8000 tcp:8000`). Las pruebas de la app se hicieron con un script que maneja el teléfono por
+`adb` y verifica los textos de cada pantalla. No hubo cierres inesperados (log de crashes vacío).
+
+| Área | Qué se comprobó | Resultado |
+|---|---|---|
+| Mock | `python test_server.py` | 12/12 OK |
+| Build | `./gradlew assembleDebug` | Compila (solo 2 avisos de íconos obsoletos en `AppSettingsScreen`) |
+| Flujo 1 · Acceso | Errores de email vacío o inválido y contraseña corta; ingreso válido; Atrás desde el Home no vuelve al Login; Register valida el nombre y Atrás vuelve al Login | 9/9 |
+| Flujo 2 · Home | Home, Notifications, "Mark all as read" y Atrás | OK |
+| Flujo 3 · Asistente | Idle → Listening → Processing → Speaking (automático), "Tap to Interrupt", Conversation, Error al no detectar voz, "Not Now" y cierre del asistente | OK |
+| Flujo 4 · Workout (RF01, RF02, RF05) | Catálogo y detalle desde el mock; `empty` → estado vacío; `error` y `malformed` → banner offline con los datos guardados en Room; detalle ya abierto visible offline; sin servidor y sin caché → error con "Try again"; al volver el servidor, "Try again" recupera el catálogo | OK |
+| Flujo 5 · Nutrición (RF03, RF04) | Voice → análisis → confirmación guarda la comida en Room y el Dashboard la suma; la comida sigue guardada al cerrar y reabrir la app | OK |
+| Flujos 6 y 7 | Progress Dashboard; Profile; Log out con confirmación vuelve al Login y Atrás no regresa a la app | OK |
