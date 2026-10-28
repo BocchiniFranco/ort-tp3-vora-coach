@@ -352,7 +352,17 @@ npx codeburn
 
 ## 11. Video de demostración
 
-_(pendiente: se agrega el link cuando el video esté grabado)_
+Carpeta pública en Google Drive: **[VORA Coach TP3 video](https://drive.google.com/drive/folders/1NEIrqWFu07TWbekN0l2_b91wArmV5P5H)**
+
+Grabado en el teléfono (Samsung Galaxy A50) contra el mock de `mock/`. Son cuatro clips sin audio porque
+Android graba como máximo 3 minutos seguidos:
+
+| Clip | Duración | Qué muestra |
+|---|---|---|
+| `01_login_registro_home.mp4` | 2:13 | Validaciones de Register y Login, ingreso, Home y Notifications |
+| `02_asistente_de_voz.mp4` | 1:18 | Idle → Listening → Processing → Speaking, "Tap to Interrupt", Conversation y estado de Error |
+| `03_workout_mock_y_room.mp4` | 2:25 | Catálogo y detalle desde el mock, escenarios `empty`, `error` y `malformed`, detalle leído de Room sin conexión |
+| `04_nutricion_progreso_perfil.mp4` | 1:56 | Comida registrada por voz y guardada en Room, Progress, Profile y Log out |
 
 ## 12. Pruebas realizadas
 
@@ -370,3 +380,75 @@ Probado el 27/10/2026 en un **Samsung Galaxy A50** (Android 11) conectado por US
 | Flujo 4 · Workout (RF01, RF02, RF05) | Catálogo y detalle desde el mock; `empty` → estado vacío; `error` y `malformed` → banner offline con los datos guardados en Room; detalle ya abierto visible offline; sin servidor y sin caché → error con "Try again"; al volver el servidor, "Try again" recupera el catálogo | OK |
 | Flujo 5 · Nutrición (RF03, RF04) | Voice → análisis → confirmación guarda la comida en Room y el Dashboard la suma; la comida sigue guardada al cerrar y reabrir la app | OK |
 | Flujos 6 y 7 | Progress Dashboard; Profile; Log out con confirmación vuelve al Login y Atrás no regresa a la app | OK |
+
+## 13. Preguntas de la entrega
+
+### Pregunta 3: ¿Qué arquitectura usaron y por qué? ¿Podría mejorarla?
+
+* **Qué usamos:** Clean Architecture simplificada con MVVM e inyección de dependencias con Hilt. Separamos en
+  cuatro capas: UI en Compose, ViewModels con `StateFlow`, Repositorios (que deciden si ir a la red o a la base
+  local) y fuentes de datos con Retrofit y Room. Además, cada capa tiene su propio modelo (DTO, Entity y dominio)
+  conectados con mappers (`toDomain()`, `toEntity()`).
+* **Por qué la elegimos:** Cada clase tiene una sola responsabilidad, el estado sobrevive a la rotación de
+  pantalla, el repositorio resuelve el modo offline leyendo de Room si cae la API, y nos permitió trabajar a los
+  tres en paralelo sin pisarnos en Git.
+* **Cómo la mejoraríamos:**
+  1. Agregar interfaces en los repositorios y casos de uso (`UseCases`) para poder inyectar fakes y hacer tests
+     unitarios.
+  2. Hacer que Room sea la única fuente de verdad exponiendo un `Flow` continuo en lugar de lecturas puntuales
+     con `Result`.
+  3. Mover `DemoData` detrás de repositorios y, si la app crece, modularizar por feature (`:feature:workout`,
+     `:feature:nutrition`).
+
+### Pregunta 4: ¿Tuvieron objetos stateful y stateless? ¿Cómo definen la elección?
+
+* **Stateless (sin estado):** Casi todas las pantallas y los componentes de `ui/components/`. Aplicamos state
+  hoisting: solo reciben el `uiState` y avisan eventos con lambdas, lo que nos permite reutilizarlos y verlos en
+  `@Preview` sin levantar Hilt ni ViewModels.
+* **Stateful (con estado):** Los ViewModels (que guardan el `MutableStateFlow`), los destinos del `NavGraph` (que
+  instancian el ViewModel con `hiltViewModel()` y observan con `collectAsStateWithLifecycle()`) y estados visuales
+  locales manejados con `remember` o `rememberSaveable` (como el texto tipeado en Login, el botón de ocultar
+  contraseña o las animaciones del Coach).
+* **Criterio:** Si el dato es de negocio, se comparte entre pantallas (como `AuthViewModel`) o debe sobrevivir a
+  cambios de configuración, va al ViewModel. Si es un detalle visual interno de una sola pantalla, va en el
+  Composable con `remember`. El resto es siempre stateless.
+
+### Pregunta 5: Mejoras y efectos si escala el volumen de datos
+
+* **Pasar todas las listas a Lazy:** En `DailyMealsScreen` usamos `Column` con `verticalScroll` y `forEach`, que
+  dibuja todo en memoria de golpe. Con cientos de comidas se trabaría; hay que pasarlo a `LazyColumn` con `key`,
+  como ya hicimos en el catálogo de entrenamientos.
+* **Paginación y caché incremental:** Hoy descargamos todo el catálogo junto y pisamos la tabla entera en Room. A
+  gran escala usaríamos Paging 3 con `RemoteMediator`, actualizaciones con `@Upsert` y tiempo de expiración para
+  la caché.
+* **Migraciones en Room:** Tenemos `fallbackToDestructiveMigration(true)`, que si cambia la base de datos borra
+  las comidas cargadas por el usuario. Para producción hay que activar `exportSchema = true` y programar las
+  clases `Migration`.
+* **Lo que ya escala bien:** Los totales diarios de nutrición se calculan directamente en SQLite (`SUM` en
+  `MealDao.observeDailyTotals`) y no recorriendo la lista en Kotlin.
+
+### Pregunta 6: Manejo de errores, dónde está en el código y estrategia de mapeo
+
+* **Dónde está:** En el Repositorio. `WorkoutRepository` valida `response.isSuccessful` y distingue códigos HTTP
+  (`404` no existe, `503` servidor no disponible), mientras que con `runCatching` atrapamos cortes de red o fallos
+  de parseo cuando el mock devuelve un JSON malformado (que llega con HTTP 200 pero falla al leerse).
+* **Respaldo y validación:** Si la API falla, el repositorio lee Room y devuelve `CachedData(isFromCache = true)`
+  para mostrar los datos junto al banner offline, sin borrar nunca la caché válida previa. En los mappers usamos
+  `mapNotNull` para descartar ítems corruptos sin romper toda la lista, y los formularios se validan en el
+  ViewModel.
+* **Mejora en el mapeo:** Hoy el repositorio devuelve el mensaje de error ya armado en texto y `runCatching`
+  captura también `CancellationException`. Lo ideal es atrapar solo excepciones esperadas (`IOException`,
+  `HttpException`, `JsonParseException`) y devolver una `sealed interface DataError` (`Network`, `NotFound`,
+  `Server`, `Parsing`) para que la UI elija el texto a mostrar.
+
+### Pregunta 7: ¿Cómo la pasarían a español conservando el inglés? ¿Y otros idiomas?
+
+* **Recursos de strings:** Extraer los textos fijos de los composables a `res/values/strings.xml` (inglés por
+  defecto) y agregar `res/values-es/strings.xml` (español), llamándolos con `stringResource`,
+  `pluralStringResource` y placeholders (`%1$s`, `%1$d`).
+* **Formatos y errores:** Usar `NumberFormat` y `DateTimeFormatter` para que números (de `1,420 kcal` a
+  `1.420 kcal`) y fechas cambien solos según el `Locale`, y mapear los `DataError` del repositorio a textos de
+  `strings.xml` en la UI.
+* **Selector en la app y servidor:** Conectar el botón `"EN"` del Login a
+  `AppCompatDelegate.setApplicationLocales(...)` configurando `locales_config.xml`, y sumar el header
+  `Accept-Language` en el interceptor de OkHttp para que la API devuelva el contenido ya traducido.
