@@ -1,0 +1,289 @@
+{
+  "/health": {
+    "method": "GET",
+    "request": null,
+    "response": {
+      "status": "ok",
+      "service": "vora-mock",
+      "version": "1.0"
+    }
+  },
+  "/v1/workouts": {
+    "method": "GET",
+    "request": null,
+    "response": {
+      "data": [
+        {
+          "id": "w01",
+          "name": "Fuerza inicial",
+          "level": "beginner",
+          "durationMinutes": 25,
+          "exerciseCount": 3
+        },
+        {
+          "id": "w02",
+          "name": "Entrenamiento completo",
+          "level": "intermediate",
+          "durationMinutes": 35,
+          "exerciseCount": 3
+        },
+        {
+          "id": "w03",
+          "name": "Fuerza y constancia",
+          "level": "beginner",
+          "durationMinutes": 30,
+          "exerciseCount": 3
+        }
+      ]
+    }
+  },
+  "/v1/workouts/w01": {
+    "method": "GET",
+    "request": null,
+    "response": {
+      "data": {
+        "id": "w01",
+        "name": "Fuerza inicial",
+        "level": "beginner",
+        "durationMinutes": 25,
+        "exerciseCount": 3,
+        "description": "Rutina de ejemplo para el trabajo práctico.",
+        "exercises": [
+          {
+            "id": "e01",
+            "name": "Sentadilla",
+            "muscleGroup": "Piernas",
+            "sets": 3,
+            "reps": 10,
+            "restSeconds": 60,
+            "instructions": "Separá los pies y flexioná las rodillas con control.",
+            "tip": "Usá una carga que puedas controlar."
+          },
+          {
+            "id": "e02",
+            "name": "Remo con mancuerna",
+            "muscleGroup": "Espalda",
+            "sets": 3,
+            "reps": 10,
+            "restSeconds": 60,
+            "instructions": "Apoyá una mano y llevá la mancuerna hacia el torso.",
+            "tip": "Usá una carga que puedas controlar."
+          },
+          {
+            "id": "e03",
+            "name": "Press con mancuernas",
+            "muscleGroup": "Pecho",
+            "sets": 3,
+            "reps": 10,
+            "restSeconds": 60,
+            "instructions": "Empujá las mancuernas con un movimiento controlado.",
+            "tip": "Usá una carga que puedas controlar."
+          }
+        ]
+      }
+    }
+  },
+  "/v1/plans/weekly?startDate=2026-10-05": {
+    "method": "GET",
+    "request": null,
+    "response": {
+      "data": {
+        "startDate": "2026-10-05",
+        "days": [
+          {
+            "date": "2026-10-05",
+            "workoutId": "w01",
+            "type": "workout"
+          },
+          {
+            "date": "2026-10-06",
+            "workoutId": null,
+            "type": "recovery"
+          },
+          {
+            "date": "2026-10-07",
+            "workoutId": "w02",
+            "type": "workout"
+          },
+          {
+            "date": "2026-10-08",
+            "workoutId": null,
+            "type": "recovery"
+          },
+          {
+            "date": "2026-10-09",
+            "workoutId": "w03",
+            "type": "workout"
+          },
+          {
+            "date": "2026-10-10",
+            "workoutId": null,
+            "type": "recovery"
+          },
+          {
+            "date": "2026-10-11",
+            "workoutId": null,
+            "type": "recovery"
+          }
+        ]
+      }
+    }
+  },
+  "/v1/foods?q=avena&page=1&pageSize=10": {
+    "method": "GET",
+    "request": null,
+    "response": {
+      "data": [
+        {
+          "id": "f01",
+          "name": "Avena",
+          "nutritionPer100g": {
+            "kcal": 389,
+            "proteinG": 16.9,
+            "carbsG": 66.3,
+            "fatG": 6.9
+          }
+        }
+      ],
+      "meta": {
+        "page": 1,
+        "pageSize": 10,
+        "total": 1
+      }
+    }
+  },
+  "/v1/coach/suggestions": {
+    "method": "GET",
+    "request": null,
+    "response": {
+      "data": [
+        {
+          "id": "s01",
+          "text": "¿Cómo empiezo mi entrenamiento?"
+        },
+        {
+          "id": "s02",
+          "text": "¿Qué puedo cenar?"
+        },
+        {
+          "id": "s03",
+          "text": "¿Cómo reviso mi progreso?"
+        }
+      ]
+    }
+  },
+  "/v1/coach/messages": {
+    "method": "POST",
+    "request": {
+      "text": "¿Cómo empiezo mi entrenamiento?",
+      "context": {
+        "coachingStyle": "balanced"
+      }
+    },
+    "response": {
+      "data": {
+        "role": "assistant",
+        "text": "Abrí el detalle del entrenamiento y registrá las series que completes. Este consejo es una respuesta de demostración.",
+        "topic": "workout",
+        "isSimulated": true
+      }
+    }
+  },
+  "/v1/nutrition/analyses": {
+    "method": "POST",
+    "request": {
+      "source": "text",
+      "text": "Avena con leche y banana",
+      "preset": "breakfast"
+    },
+    "response": {
+      "data": {
+        "source": "text",
+        "preset": "breakfast",
+        "isSimulated": true,
+        "requiresConfirmation": true,
+        "items": [
+          {
+            "foodId": "f01",
+            "name": "Avena",
+            "grams": 40,
+            "nutritionPer100g": {
+              "kcal": 389,
+              "proteinG": 16.9,
+              "carbsG": 66.3,
+              "fatG": 6.9
+            }
+          },
+          {
+            "foodId": "f02",
+            "name": "Leche",
+            "grams": 200,
+            "nutritionPer100g": {
+              "kcal": 61,
+              "proteinG": 3.2,
+              "carbsG": 4.8,
+              "fatG": 3.3
+            }
+          },
+          {
+            "foodId": "f03",
+            "name": "Banana",
+            "grams": 100,
+            "nutritionPer100g": {
+              "kcal": 89,
+              "proteinG": 1.1,
+              "carbsG": 22.8,
+              "fatG": 0.3
+            }
+          }
+        ],
+        "totals": {
+          "kcal": 366.6,
+          "proteinG": 14.26,
+          "carbsG": 58.92,
+          "fatG": 9.66
+        }
+      }
+    }
+  },
+  "/v1/progress/weekly-review": {
+    "method": "POST",
+    "request": {
+      "startDate": "2026-10-05",
+      "summary": {
+        "completedSessions": 3,
+        "volumeKg": 1800,
+        "averageKcal": 1900
+      }
+    },
+    "response": {
+      "data": {
+        "startDate": "2026-10-05",
+        "isSimulated": true,
+        "summary": {
+          "completedSessions": 3,
+          "volumeKg": 1800,
+          "averageKcal": 1900
+        },
+        "text": "Registraste 3 sesiones, 1800 kg de volumen y un promedio de 1900 kcal por día. Revisá tus registros y planificá la próxima semana.",
+        "recommendations": [
+          "Revisar las sesiones completadas.",
+          "Completar los días sin registros."
+        ]
+      }
+    }
+  },
+  "/v1/activity/daily?date=2026-10-06": {
+    "method": "GET",
+    "request": null,
+    "response": {
+      "data": {
+        "date": "2026-10-06",
+        "steps": 6200,
+        "distanceKm": 4.2,
+        "activeKcal": 280,
+        "isSimulated": true
+      }
+    }
+  }
+}

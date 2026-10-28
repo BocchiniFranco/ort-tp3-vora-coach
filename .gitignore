@@ -21,6 +21,5 @@ local.properties
 # Salida local de graphify (grafo de conocimiento del código): no se sube al repo
 graphify-out/
 
-# Mock local de la cátedra: se obtiene del material del curso y NO se sube al repo
-/mock/
-/tools/mock-server/
+# Caché de Python que genera el mock local (mock/) al ejecutarse
+__pycache__/

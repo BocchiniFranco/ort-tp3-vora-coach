@@ -1,0 +1,1862 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "VORA Mock API",
+    "version": "1.0.0",
+    "description": "Contrato educativo. Sin autenticación ni persistencia. Los registros privados se guardan en Room y Firebase."
+  },
+  "servers": [
+    {
+      "url": "/",
+      "description": "Mismo host que sirve esta documentación"
+    },
+    {
+      "url": "http://localhost:8000"
+    },
+    {
+      "url": "http://10.0.2.2:8000",
+      "description": "Android Emulator"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Salud del servidor",
+        "operationId": "vora00",
+        "parameters": [
+          {
+            "name": "X-Mock-Scenario",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "normal",
+                "empty",
+                "error",
+                "malformed"
+              ]
+            },
+            "description": "empty solo cambia listas; malformed es JSON inválido intencional."
+          },
+          {
+            "name": "X-Mock-Delay-Ms",
+            "in": "header",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "description": "Demora local en ms."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Respuesta normal; escenarios de ejemplo en Postman.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "service": {
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "service",
+                    "version"
+                  ]
+                },
+                "example": {
+                  "status": "ok",
+                  "service": "vora-mock",
+                  "version": "1.0"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método incorrecto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error simulado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/workouts": {
+      "get": {
+        "summary": "Lista de entrenamientos",
+        "operationId": "vora01",
+        "parameters": [
+          {
+            "name": "X-Mock-Scenario",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "normal",
+                "empty",
+                "error",
+                "malformed"
+              ]
+            },
+            "description": "empty solo cambia listas; malformed es JSON inválido intencional."
+          },
+          {
+            "name": "X-Mock-Delay-Ms",
+            "in": "header",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "description": "Demora local en ms."
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "beginner",
+                "intermediate",
+                "advanced"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Respuesta normal; escenarios de ejemplo en Postman.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/WorkoutSummary"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                },
+                "example": {
+                  "data": [
+                    {
+                      "id": "w01",
+                      "name": "Fuerza inicial",
+                      "level": "beginner",
+                      "durationMinutes": 25,
+                      "exerciseCount": 3
+                    },
+                    {
+                      "id": "w02",
+                      "name": "Entrenamiento completo",
+                      "level": "intermediate",
+                      "durationMinutes": 35,
+                      "exerciseCount": 3
+                    },
+                    {
+                      "id": "w03",
+                      "name": "Fuerza y constancia",
+                      "level": "beginner",
+                      "durationMinutes": 30,
+                      "exerciseCount": 3
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método incorrecto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error simulado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/workouts/{workoutId}": {
+      "get": {
+        "summary": "Detalle de entrenamiento",
+        "operationId": "vora02",
+        "parameters": [
+          {
+            "name": "X-Mock-Scenario",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "normal",
+                "empty",
+                "error",
+                "malformed"
+              ]
+            },
+            "description": "empty solo cambia listas; malformed es JSON inválido intencional."
+          },
+          {
+            "name": "X-Mock-Delay-Ms",
+            "in": "header",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "description": "Demora local en ms."
+          },
+          {
+            "name": "workoutId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Respuesta normal; escenarios de ejemplo en Postman.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Workout"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                },
+                "example": {
+                  "data": {
+                    "id": "w01",
+                    "name": "Fuerza inicial",
+                    "level": "beginner",
+                    "durationMinutes": 25,
+                    "exerciseCount": 3,
+                    "description": "Rutina de ejemplo para el trabajo práctico.",
+                    "exercises": [
+                      {
+                        "id": "e01",
+                        "name": "Sentadilla",
+                        "muscleGroup": "Piernas",
+                        "sets": 3,
+                        "reps": 10,
+                        "restSeconds": 60,
+                        "instructions": "Separá los pies y flexioná las rodillas con control.",
+                        "tip": "Usá una carga que puedas controlar."
+                      },
+                      {
+                        "id": "e02",
+                        "name": "Remo con mancuerna",
+                        "muscleGroup": "Espalda",
+                        "sets": 3,
+                        "reps": 10,
+                        "restSeconds": 60,
+                        "instructions": "Apoyá una mano y llevá la mancuerna hacia el torso.",
+                        "tip": "Usá una carga que puedas controlar."
+                      },
+                      {
+                        "id": "e03",
+                        "name": "Press con mancuernas",
+                        "muscleGroup": "Pecho",
+                        "sets": 3,
+                        "reps": 10,
+                        "restSeconds": 60,
+                        "instructions": "Empujá las mancuernas con un movimiento controlado.",
+                        "tip": "Usá una carga que puedas controlar."
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método incorrecto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error simulado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/plans/weekly": {
+      "get": {
+        "summary": "Plan semanal opcional",
+        "operationId": "vora03",
+        "parameters": [
+          {
+            "name": "X-Mock-Scenario",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "normal",
+                "empty",
+                "error",
+                "malformed"
+              ]
+            },
+            "description": "empty solo cambia listas; malformed es JSON inválido intencional."
+          },
+          {
+            "name": "X-Mock-Delay-Ms",
+            "in": "header",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "description": "Demora local en ms."
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "default": "2026-10-05"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Respuesta normal; escenarios de ejemplo en Postman.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/WeeklyPlan"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                },
+                "example": {
+                  "data": {
+                    "startDate": "2026-10-05",
+                    "days": [
+                      {
+                        "date": "2026-10-05",
+                        "workoutId": "w01",
+                        "type": "workout"
+                      },
+                      {
+                        "date": "2026-10-06",
+                        "workoutId": null,
+                        "type": "recovery"
+                      },
+                      {
+                        "date": "2026-10-07",
+                        "workoutId": "w02",
+                        "type": "workout"
+                      },
+                      {
+                        "date": "2026-10-08",
+                        "workoutId": null,
+                        "type": "recovery"
+                      },
+                      {
+                        "date": "2026-10-09",
+                        "workoutId": "w03",
+                        "type": "workout"
+                      },
+                      {
+                        "date": "2026-10-10",
+                        "workoutId": null,
+                        "type": "recovery"
+                      },
+                      {
+                        "date": "2026-10-11",
+                        "workoutId": null,
+                        "type": "recovery"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método incorrecto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error simulado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/foods": {
+      "get": {
+        "summary": "Búsqueda de alimentos",
+        "operationId": "vora04",
+        "parameters": [
+          {
+            "name": "X-Mock-Scenario",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "normal",
+                "empty",
+                "error",
+                "malformed"
+              ]
+            },
+            "description": "empty solo cambia listas; malformed es JSON inválido intencional."
+          },
+          {
+            "name": "X-Mock-Delay-Ms",
+            "in": "header",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "description": "Demora local en ms."
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Respuesta normal; escenarios de ejemplo en Postman.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Food"
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "page": {
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        "pageSize": {
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        "total": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      },
+                      "required": [
+                        "page",
+                        "pageSize",
+                        "total"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                },
+                "example": {
+                  "data": [
+                    {
+                      "id": "f01",
+                      "name": "Avena",
+                      "nutritionPer100g": {
+                        "kcal": 389,
+                        "proteinG": 16.9,
+                        "carbsG": 66.3,
+                        "fatG": 6.9
+                      }
+                    }
+                  ],
+                  "meta": {
+                    "page": 1,
+                    "pageSize": 10,
+                    "total": 1
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método incorrecto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error simulado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/coach/suggestions": {
+      "get": {
+        "summary": "Sugerencias del coach",
+        "operationId": "vora05",
+        "parameters": [
+          {
+            "name": "X-Mock-Scenario",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "normal",
+                "empty",
+                "error",
+                "malformed"
+              ]
+            },
+            "description": "empty solo cambia listas; malformed es JSON inválido intencional."
+          },
+          {
+            "name": "X-Mock-Delay-Ms",
+            "in": "header",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "description": "Demora local en ms."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Respuesta normal; escenarios de ejemplo en Postman.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Suggestion"
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                },
+                "example": {
+                  "data": [
+                    {
+                      "id": "s01",
+                      "text": "¿Cómo empiezo mi entrenamiento?"
+                    },
+                    {
+                      "id": "s02",
+                      "text": "¿Qué puedo cenar?"
+                    },
+                    {
+                      "id": "s03",
+                      "text": "¿Cómo reviso mi progreso?"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método incorrecto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error simulado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/coach/messages": {
+      "post": {
+        "summary": "Conversación por texto",
+        "operationId": "vora06",
+        "parameters": [
+          {
+            "name": "X-Mock-Scenario",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "normal",
+                "empty",
+                "error",
+                "malformed"
+              ]
+            },
+            "description": "empty solo cambia listas; malformed es JSON inválido intencional."
+          },
+          {
+            "name": "X-Mock-Delay-Ms",
+            "in": "header",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "description": "Demora local en ms."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Respuesta normal; escenarios de ejemplo en Postman.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CoachReply"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                },
+                "example": {
+                  "data": {
+                    "role": "assistant",
+                    "text": "Abrí el detalle del entrenamiento y registrá las series que completes. Este consejo es una respuesta de demostración.",
+                    "topic": "workout",
+                    "isSimulated": true
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método incorrecto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error simulado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Content-Type incorrecto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoachRequest"
+              },
+              "example": {
+                "text": "¿Cómo empiezo mi entrenamiento?",
+                "context": {
+                  "coachingStyle": "balanced"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/nutrition/analyses": {
+      "post": {
+        "summary": "Análisis simulado opcional",
+        "operationId": "vora07",
+        "parameters": [
+          {
+            "name": "X-Mock-Scenario",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "normal",
+                "empty",
+                "error",
+                "malformed"
+              ]
+            },
+            "description": "empty solo cambia listas; malformed es JSON inválido intencional."
+          },
+          {
+            "name": "X-Mock-Delay-Ms",
+            "in": "header",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "description": "Demora local en ms."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Respuesta normal; escenarios de ejemplo en Postman.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Analysis"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                },
+                "example": {
+                  "data": {
+                    "source": "text",
+                    "preset": "breakfast",
+                    "isSimulated": true,
+                    "requiresConfirmation": true,
+                    "items": [
+                      {
+                        "foodId": "f01",
+                        "name": "Avena",
+                        "grams": 40,
+                        "nutritionPer100g": {
+                          "kcal": 389,
+                          "proteinG": 16.9,
+                          "carbsG": 66.3,
+                          "fatG": 6.9
+                        }
+                      },
+                      {
+                        "foodId": "f02",
+                        "name": "Leche",
+                        "grams": 200,
+                        "nutritionPer100g": {
+                          "kcal": 61,
+                          "proteinG": 3.2,
+                          "carbsG": 4.8,
+                          "fatG": 3.3
+                        }
+                      },
+                      {
+                        "foodId": "f03",
+                        "name": "Banana",
+                        "grams": 100,
+                        "nutritionPer100g": {
+                          "kcal": 89,
+                          "proteinG": 1.1,
+                          "carbsG": 22.8,
+                          "fatG": 0.3
+                        }
+                      }
+                    ],
+                    "totals": {
+                      "kcal": 366.6,
+                      "proteinG": 14.26,
+                      "carbsG": 58.92,
+                      "fatG": 9.66
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método incorrecto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error simulado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Content-Type incorrecto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalysisRequest"
+              },
+              "example": {
+                "source": "text",
+                "text": "Avena con leche y banana",
+                "preset": "breakfast"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/progress/weekly-review": {
+      "post": {
+        "summary": "Revisión semanal opcional",
+        "operationId": "vora08",
+        "parameters": [
+          {
+            "name": "X-Mock-Scenario",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "normal",
+                "empty",
+                "error",
+                "malformed"
+              ]
+            },
+            "description": "empty solo cambia listas; malformed es JSON inválido intencional."
+          },
+          {
+            "name": "X-Mock-Delay-Ms",
+            "in": "header",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "description": "Demora local en ms."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Respuesta normal; escenarios de ejemplo en Postman.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Review"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                },
+                "example": {
+                  "data": {
+                    "startDate": "2026-10-05",
+                    "isSimulated": true,
+                    "summary": {
+                      "completedSessions": 3,
+                      "volumeKg": 1800,
+                      "averageKcal": 1900
+                    },
+                    "text": "Registraste 3 sesiones, 1800 kg de volumen y un promedio de 1900 kcal por día. Revisá tus registros y planificá la próxima semana.",
+                    "recommendations": [
+                      "Revisar las sesiones completadas.",
+                      "Completar los días sin registros."
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método incorrecto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error simulado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Content-Type incorrecto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReviewRequest"
+              },
+              "example": {
+                "startDate": "2026-10-05",
+                "summary": {
+                  "completedSessions": 3,
+                  "volumeKg": 1800,
+                  "averageKcal": 1900
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/activity/daily": {
+      "get": {
+        "summary": "Actividad simulada opcional",
+        "operationId": "vora09",
+        "parameters": [
+          {
+            "name": "X-Mock-Scenario",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "normal",
+                "empty",
+                "error",
+                "malformed"
+              ]
+            },
+            "description": "empty solo cambia listas; malformed es JSON inválido intencional."
+          },
+          {
+            "name": "X-Mock-Delay-Ms",
+            "in": "header",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "description": "Demora local en ms."
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "default": "2026-10-06"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Respuesta normal; escenarios de ejemplo en Postman.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Activity"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ]
+                },
+                "example": {
+                  "data": {
+                    "date": "2026-10-06",
+                    "steps": 6200,
+                    "distanceKm": 4.2,
+                    "activeKcal": 280,
+                    "isSimulated": true
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Recurso inexistente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Método incorrecto",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Error simulado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Nutrition": {
+        "type": "object",
+        "properties": {
+          "kcal": {
+            "type": "number",
+            "minimum": 0
+          },
+          "proteinG": {
+            "type": "number",
+            "minimum": 0
+          },
+          "carbsG": {
+            "type": "number",
+            "minimum": 0
+          },
+          "fatG": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "kcal",
+          "proteinG",
+          "carbsG",
+          "fatG"
+        ]
+      },
+      "Food": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "nutritionPer100g": {
+            "$ref": "#/components/schemas/Nutrition"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "nutritionPer100g"
+        ]
+      },
+      "WorkoutSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "beginner",
+              "intermediate",
+              "advanced"
+            ]
+          },
+          "durationMinutes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "exerciseCount": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "level",
+          "durationMinutes",
+          "exerciseCount"
+        ]
+      },
+      "Exercise": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "muscleGroup": {
+            "type": "string"
+          },
+          "sets": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "reps": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "restSeconds": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "instructions": {
+            "type": "string"
+          },
+          "tip": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "muscleGroup",
+          "sets",
+          "reps",
+          "restSeconds",
+          "instructions",
+          "tip"
+        ]
+      },
+      "Workout": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "beginner",
+              "intermediate",
+              "advanced"
+            ]
+          },
+          "durationMinutes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "exerciseCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "description": {
+            "type": "string"
+          },
+          "exercises": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Exercise"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "level",
+          "durationMinutes",
+          "exerciseCount",
+          "description",
+          "exercises"
+        ]
+      },
+      "Suggestion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "text"
+        ]
+      },
+      "CoachRequest": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "context": {
+            "type": "object",
+            "properties": {
+              "coachingStyle": {
+                "type": "string",
+                "enum": [
+                  "supportive",
+                  "balanced",
+                  "direct"
+                ]
+              }
+            }
+          }
+        },
+        "required": [
+          "text"
+        ]
+      },
+      "CoachReply": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "assistant"
+            ]
+          },
+          "text": {
+            "type": "string"
+          },
+          "topic": {
+            "type": "string",
+            "enum": [
+              "general",
+              "workout",
+              "nutrition",
+              "progress"
+            ]
+          },
+          "isSimulated": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "role",
+          "text",
+          "topic",
+          "isSimulated"
+        ]
+      },
+      "AnalysisRequest": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "text",
+              "photo"
+            ]
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "preset": {
+            "type": "string",
+            "enum": [
+              "breakfast",
+              "lunch",
+              "vegetarian"
+            ]
+          }
+        },
+        "required": [
+          "source"
+        ],
+        "description": "text es requerido si source=text; photo usa un fixture sin subir imagen. preset por defecto breakfast."
+      },
+      "Analysis": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "text",
+              "photo"
+            ]
+          },
+          "preset": {
+            "type": "string",
+            "enum": [
+              "breakfast",
+              "lunch",
+              "vegetarian"
+            ]
+          },
+          "isSimulated": {
+            "type": "boolean"
+          },
+          "requiresConfirmation": {
+            "type": "boolean"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "foodId": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "grams": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "nutritionPer100g": {
+                  "$ref": "#/components/schemas/Nutrition"
+                }
+              },
+              "required": [
+                "foodId",
+                "name",
+                "grams",
+                "nutritionPer100g"
+              ]
+            }
+          },
+          "totals": {
+            "$ref": "#/components/schemas/Nutrition"
+          }
+        },
+        "required": [
+          "source",
+          "preset",
+          "isSimulated",
+          "requiresConfirmation",
+          "items",
+          "totals"
+        ]
+      },
+      "Summary": {
+        "type": "object",
+        "properties": {
+          "completedSessions": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "volumeKg": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1000000
+          },
+          "averageKcal": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 20000
+          }
+        },
+        "required": [
+          "completedSessions",
+          "volumeKg",
+          "averageKcal"
+        ]
+      },
+      "ReviewRequest": {
+        "type": "object",
+        "properties": {
+          "startDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/Summary"
+          }
+        },
+        "required": [
+          "startDate",
+          "summary"
+        ]
+      },
+      "Review": {
+        "type": "object",
+        "properties": {
+          "startDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "isSimulated": {
+            "type": "boolean"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/Summary"
+          },
+          "text": {
+            "type": "string"
+          },
+          "recommendations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "startDate",
+          "isSimulated",
+          "summary",
+          "text",
+          "recommendations"
+        ]
+      },
+      "Activity": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "steps": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "distanceKm": {
+            "type": "number",
+            "minimum": 0
+          },
+          "activeKcal": {
+            "type": "number",
+            "minimum": 0
+          },
+          "isSimulated": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "date",
+          "steps",
+          "distanceKm",
+          "activeKcal",
+          "isSimulated"
+        ]
+      },
+      "WeeklyPlan": {
+        "type": "object",
+        "properties": {
+          "startDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "days": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "workoutId": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "workout",
+                    "recovery"
+                  ]
+                }
+              },
+              "required": [
+                "date",
+                "workoutId",
+                "type"
+              ]
+            }
+          }
+        },
+        "required": [
+          "startDate",
+          "days"
+        ]
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ]
+          }
+        },
+        "required": [
+          "error"
+        ]
+      }
+    }
+  }
+}

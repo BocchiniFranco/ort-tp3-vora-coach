@@ -1,0 +1,310 @@
+{
+  "workouts": [
+    {
+      "id": "w01",
+      "name": "Fuerza inicial",
+      "level": "beginner",
+      "durationMinutes": 25,
+      "exerciseCount": 3,
+      "description": "Rutina de ejemplo para el trabajo práctico.",
+      "exercises": [
+        {
+          "id": "e01",
+          "name": "Sentadilla",
+          "muscleGroup": "Piernas",
+          "sets": 3,
+          "reps": 10,
+          "restSeconds": 60,
+          "instructions": "Separá los pies y flexioná las rodillas con control.",
+          "tip": "Usá una carga que puedas controlar."
+        },
+        {
+          "id": "e02",
+          "name": "Remo con mancuerna",
+          "muscleGroup": "Espalda",
+          "sets": 3,
+          "reps": 10,
+          "restSeconds": 60,
+          "instructions": "Apoyá una mano y llevá la mancuerna hacia el torso.",
+          "tip": "Usá una carga que puedas controlar."
+        },
+        {
+          "id": "e03",
+          "name": "Press con mancuernas",
+          "muscleGroup": "Pecho",
+          "sets": 3,
+          "reps": 10,
+          "restSeconds": 60,
+          "instructions": "Empujá las mancuernas con un movimiento controlado.",
+          "tip": "Usá una carga que puedas controlar."
+        }
+      ]
+    },
+    {
+      "id": "w02",
+      "name": "Entrenamiento completo",
+      "level": "intermediate",
+      "durationMinutes": 35,
+      "exerciseCount": 3,
+      "description": "Rutina de ejemplo para el trabajo práctico.",
+      "exercises": [
+        {
+          "id": "e04",
+          "name": "Puente de glúteos",
+          "muscleGroup": "Piernas",
+          "sets": 3,
+          "reps": 10,
+          "restSeconds": 60,
+          "instructions": "Elevá la cadera sin arquear la espalda.",
+          "tip": "Usá una carga que puedas controlar."
+        },
+        {
+          "id": "e05",
+          "name": "Press de hombros",
+          "muscleGroup": "Hombros",
+          "sets": 3,
+          "reps": 10,
+          "restSeconds": 60,
+          "instructions": "Empujá hacia arriba manteniendo una postura estable.",
+          "tip": "Usá una carga que puedas controlar."
+        },
+        {
+          "id": "e06",
+          "name": "Peso muerto con mancuernas",
+          "muscleGroup": "Piernas",
+          "sets": 3,
+          "reps": 10,
+          "restSeconds": 60,
+          "instructions": "Llevá la cadera hacia atrás con las mancuernas cerca del cuerpo.",
+          "tip": "Usá una carga que puedas controlar."
+        }
+      ]
+    },
+    {
+      "id": "w03",
+      "name": "Fuerza y constancia",
+      "level": "beginner",
+      "durationMinutes": 30,
+      "exerciseCount": 3,
+      "description": "Rutina de ejemplo para el trabajo práctico.",
+      "exercises": [
+        {
+          "id": "e01",
+          "name": "Sentadilla",
+          "muscleGroup": "Piernas",
+          "sets": 3,
+          "reps": 10,
+          "restSeconds": 60,
+          "instructions": "Separá los pies y flexioná las rodillas con control.",
+          "tip": "Usá una carga que puedas controlar."
+        },
+        {
+          "id": "e04",
+          "name": "Puente de glúteos",
+          "muscleGroup": "Piernas",
+          "sets": 3,
+          "reps": 10,
+          "restSeconds": 60,
+          "instructions": "Elevá la cadera sin arquear la espalda.",
+          "tip": "Usá una carga que puedas controlar."
+        },
+        {
+          "id": "e02",
+          "name": "Remo con mancuerna",
+          "muscleGroup": "Espalda",
+          "sets": 3,
+          "reps": 10,
+          "restSeconds": 60,
+          "instructions": "Apoyá una mano y llevá la mancuerna hacia el torso.",
+          "tip": "Usá una carga que puedas controlar."
+        }
+      ]
+    }
+  ],
+  "foods": [
+    {
+      "id": "f01",
+      "name": "Avena",
+      "nutritionPer100g": {
+        "kcal": 389,
+        "proteinG": 16.9,
+        "carbsG": 66.3,
+        "fatG": 6.9
+      }
+    },
+    {
+      "id": "f02",
+      "name": "Leche",
+      "nutritionPer100g": {
+        "kcal": 61,
+        "proteinG": 3.2,
+        "carbsG": 4.8,
+        "fatG": 3.3
+      }
+    },
+    {
+      "id": "f03",
+      "name": "Banana",
+      "nutritionPer100g": {
+        "kcal": 89,
+        "proteinG": 1.1,
+        "carbsG": 22.8,
+        "fatG": 0.3
+      }
+    },
+    {
+      "id": "f04",
+      "name": "Arroz cocido",
+      "nutritionPer100g": {
+        "kcal": 130,
+        "proteinG": 2.7,
+        "carbsG": 28.2,
+        "fatG": 0.3
+      }
+    },
+    {
+      "id": "f05",
+      "name": "Pollo cocido",
+      "nutritionPer100g": {
+        "kcal": 165,
+        "proteinG": 31,
+        "carbsG": 0,
+        "fatG": 3.6
+      }
+    },
+    {
+      "id": "f06",
+      "name": "Lentejas cocidas",
+      "nutritionPer100g": {
+        "kcal": 116,
+        "proteinG": 9,
+        "carbsG": 20.1,
+        "fatG": 0.4
+      }
+    },
+    {
+      "id": "f07",
+      "name": "Tomate",
+      "nutritionPer100g": {
+        "kcal": 18,
+        "proteinG": 0.9,
+        "carbsG": 3.9,
+        "fatG": 0.2
+      }
+    },
+    {
+      "id": "f08",
+      "name": "Huevo",
+      "nutritionPer100g": {
+        "kcal": 155,
+        "proteinG": 13,
+        "carbsG": 1.1,
+        "fatG": 11
+      }
+    },
+    {
+      "id": "f09",
+      "name": "Yogur natural",
+      "nutritionPer100g": {
+        "kcal": 63,
+        "proteinG": 5.3,
+        "carbsG": 7,
+        "fatG": 1.6
+      }
+    },
+    {
+      "id": "f10",
+      "name": "Manzana",
+      "nutritionPer100g": {
+        "kcal": 52,
+        "proteinG": 0.3,
+        "carbsG": 13.8,
+        "fatG": 0.2
+      }
+    },
+    {
+      "id": "f11",
+      "name": "Pan integral",
+      "nutritionPer100g": {
+        "kcal": 247,
+        "proteinG": 13,
+        "carbsG": 41,
+        "fatG": 4.2
+      }
+    },
+    {
+      "id": "f12",
+      "name": "Aceite de oliva",
+      "nutritionPer100g": {
+        "kcal": 884,
+        "proteinG": 0,
+        "carbsG": 0,
+        "fatG": 100
+      }
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "s01",
+      "text": "¿Cómo empiezo mi entrenamiento?"
+    },
+    {
+      "id": "s02",
+      "text": "¿Qué puedo cenar?"
+    },
+    {
+      "id": "s03",
+      "text": "¿Cómo reviso mi progreso?"
+    }
+  ],
+  "coachReplies": {
+    "general": "Elegí un entrenamiento o registrá una comida para completar el recorrido de la app.",
+    "workout": "Abrí el detalle del entrenamiento y registrá las series que completes. Este consejo es una respuesta de demostración.",
+    "nutrition": "Podés registrar tu comida por búsqueda o carga manual. Revisá las cantidades antes de guardar; la respuesta es de demostración.",
+    "progress": "Consultá las sesiones completadas y las comidas de los últimos siete días. El resumen se calcula con tus registros locales."
+  },
+  "analyses": {
+    "breakfast": [
+      {
+        "foodId": "f01",
+        "grams": 40
+      },
+      {
+        "foodId": "f02",
+        "grams": 200
+      },
+      {
+        "foodId": "f03",
+        "grams": 100
+      }
+    ],
+    "lunch": [
+      {
+        "foodId": "f04",
+        "grams": 150
+      },
+      {
+        "foodId": "f05",
+        "grams": 120
+      },
+      {
+        "foodId": "f07",
+        "grams": 100
+      }
+    ],
+    "vegetarian": [
+      {
+        "foodId": "f06",
+        "grams": 180
+      },
+      {
+        "foodId": "f04",
+        "grams": 100
+      },
+      {
+        "foodId": "f07",
+        "grams": 100
+      }
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VORA Mock API</title>
+<style>body{font:16px system-ui;max-width:900px;margin:40px auto;padding:0 20px;background:#f6faf8;color:#133c2f}h1{font-size:30px}label{display:block;margin:16px 0 6px}input,select,textarea,button{font:inherit;padding:10px;border:1px solid #9ebbae;border-radius:6px}input,textarea{box-sizing:border-box;width:100%}textarea{height:150px}button{background:#174f3c;color:white;cursor:pointer;margin-top:16px}pre{background:#fff;padding:20px;overflow:auto;white-space:pre-wrap}small{color:#475b53}</style>
+<h1>VORA Mock API</h1><p>Servidor de práctica para el TP. Respuestas simuladas, sin IA ni almacenamiento de datos personales.</p>
+<p><a href="/docs">Documentación Swagger</a></p>
+<label for="route">Solicitud</label><select id="route">
+<option value="GET /v1/workouts">Entrenamientos</option>
+<option value="GET /v1/workouts/w01">Detalle de entrenamiento</option>
+<option value="GET /v1/foods?q=avena&page=1&pageSize=10">Buscar alimentos</option>
+<option value="GET /v1/coach/suggestions">Sugerencias del coach</option>
+<option value="POST /v1/coach/messages">Conversar por texto</option>
+<option value="POST /v1/nutrition/analyses">Análisis simulado de comida</option>
+<option value="POST /v1/progress/weekly-review">Revisión semanal simulada</option>
+<option value="GET /v1/plans/weekly?startDate=2026-10-05">Plan semanal</option>
+<option value="GET /v1/activity/daily?date=2026-10-06">Actividad simulada</option></select>
+<label for="path">Ruta editable</label><input id="path" value="/v1/workouts">
+<label for="scenario">Escenario</label><select id="scenario"><option>normal</option><option>empty</option><option>error</option><option>malformed</option></select>
+<label for="delay">Demora en milisegundos de 0 a 10000</label><input id="delay" type="number" min="0" max="10000" value="0">
+<label for="body">Cuerpo JSON para POST</label><textarea id="body" placeholder="No se requiere cuerpo para GET"></textarea>
+<button id="send">Enviar solicitud</button><p id="status" role="status"></p><pre id="response">Seleccioná una solicitud.</pre>
+<p><small>Los análisis usan breakfast, lunch o vegetarian. Una foto no se envía ni se analiza. El historial y los registros deben guardarse en la app.</small></p>
+<script>
+const byId=id=>document.getElementById(id);
+const samples={
+ '/v1/coach/messages':{text:'¿Cómo empiezo mi entrenamiento?',context:{coachingStyle:'balanced'}},
+ '/v1/nutrition/analyses':{source:'text',text:'Avena con leche y banana',preset:'breakfast'},
+ '/v1/progress/weekly-review':{startDate:'2026-10-05',summary:{completedSessions:3,volumeKg:1800,averageKcal:1900}}
+};
+byId('route').onchange=()=>{const [,path]=byId('route').value.split(' ');byId('path').value=path;byId('body').value=samples[path]?JSON.stringify(samples[path],null,2):''};
+byId('send').onclick=async()=>{
+ const [method]=byId('route').value.split(' ');const path=byId('path').value;
+ if(!path.startsWith('/v1/')){byId('status').textContent='Usá una ruta de esta API que empiece por /v1/.';return}
+ byId('send').disabled=true;byId('status').textContent='Cargando…';
+ try{const options={method,headers:{'X-Mock-Scenario':byId('scenario').value,'X-Mock-Delay-Ms':byId('delay').value}};
+ if(method==='POST'){JSON.parse(byId('body').value);options.headers['Content-Type']='application/json';options.body=byId('body').value}
+ const start=performance.now();const res=await fetch(path,options);const raw=await res.text();
+ byId('status').textContent=`HTTP ${res.status} · ${Math.round(performance.now()-start)} ms`;
+ try{byId('response').textContent=JSON.stringify(JSON.parse(raw),null,2)}catch{byId('response').textContent=raw}
+ }catch(err){byId('status').textContent='Error: '+err.message}finally{byId('send').disabled=false}
+};
+</script></html>
